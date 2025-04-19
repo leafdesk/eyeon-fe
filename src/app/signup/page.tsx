@@ -2,6 +2,10 @@
 
 import { useState } from 'react'
 import Step1UserType from './Step1UserType'
+import Step2IdCapture from './Step2IdCapture'
+import CameraCapture from './CameraCapture'
+import Step3Form from './Step3Form'
+import Step4Complete from './Step4Complete'
 
 type UserType = 'regular' | 'visuallyImpaired' | null
 
@@ -25,7 +29,9 @@ export default function SignupScreen() {
     userType: null,
     voiceGuidance: true,
   })
+  const [isCapturing, setIsCapturing] = useState(false)
 
+  const goToPrevStep = () => setStep((prev) => prev - 1)
   const goToNextStep = () => setStep((prev) => prev + 1)
 
   return (
@@ -37,21 +43,35 @@ export default function SignupScreen() {
           onNext={goToNextStep}
         />
       )}
-      {/* {step === 2 && (
-          <Step2IdCapture
-            state={signupState}
-            setState={setSignupState}
-            onNext={goToNextStep}
-          />
-        )}
-        {step === 3 && (
-          <Step3Form
-            state={signupState}
-            setState={setSignupState}
-            onNext={goToNextStep}
-          />
-        )}
-        {step === 4 && <Step4Complete />} */}
+      {step === 2 && !isCapturing && (
+        <Step2IdCapture
+          state={signupState}
+          setState={setSignupState}
+          onPrev={goToPrevStep}
+          onNext={goToNextStep}
+          onStartCapture={() => setIsCapturing(true)}
+        />
+      )}
+      {step === 2 && isCapturing && (
+        <CameraCapture
+          onNext={goToNextStep}
+          onCancel={() => setIsCapturing(false)}
+          onCapture={(file) => {
+            setSignupState((s) => ({ ...s, idImage: file }))
+            setIsCapturing(false)
+            goToNextStep()
+          }}
+        />
+      )}
+      {step === 3 && (
+        <Step3Form
+          state={signupState}
+          setState={setSignupState}
+          onPrev={goToPrevStep}
+          onNext={goToNextStep}
+        />
+      )}
+      {step === 4 && <Step4Complete onPrev={goToPrevStep} />}
     </>
     // <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
     //   {/* Header */}
