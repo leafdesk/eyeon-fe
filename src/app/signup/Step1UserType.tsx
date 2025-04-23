@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import Image from 'next/image'
 import { X } from 'lucide-react'
+import Header from '@/components/Header'
 
 interface Props {
   state: {
@@ -29,15 +30,14 @@ export default function Step1UserType({ state, setState, onNext }: Props) {
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
-      <section className="w-full fixed top-0 flex items-center justify-between h-[56px] px-5">
-        <div className="w-6 h-6" />
-        <h1 className="font-semibold text-[20px]">회원가입</h1>
-        <button>
-          <X size={24} />
-        </button>
-      </section>
-
-      <div className="h-[56px]" />
+      <Header
+        title="회원가입"
+        right={
+          <button>
+            <X size={24} />
+          </button>
+        }
+      />
 
       {/* Welcome text */}
       <div className="flex flex-col gap-1 px-5 mb-8 pt-8">
