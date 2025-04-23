@@ -43,6 +43,7 @@ export default function MainPage() {
             width={114}
             height={114}
             className="mt-10"
+            priority
           />
           <span className="text-[20px] font-semibold mt-auto mr-auto">
             문서 작성
