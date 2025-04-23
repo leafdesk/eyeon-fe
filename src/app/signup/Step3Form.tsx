@@ -27,6 +27,27 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
 
       {/* Form */}
       <div className="flex-1 flex flex-col pt-4 px-5 space-y-5">
+        {/* Address */}
+        <div className="">
+          <label className="block text-sm mb-2">주소</label>
+          <div className="relative mb-3">
+            <Input
+              type="text"
+              placeholder="주소를 검색해 입력해 주세요"
+              className="w-full bg-[#1e2738] text-gray-300 p-4 pr-20 rounded-md"
+              readOnly
+            />
+            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs">
+              주소 검색
+            </button>
+          </div>
+          <Input
+            type="text"
+            placeholder="상세 주소를 입력해 주세요"
+            className="w-full bg-[#1e2738] text-gray-300 p-4 rounded-md"
+          />
+        </div>
+
         {/* Resident Registration Number */}
         <div className="">
           <label className="block text-sm mb-2">주민등록번호</label>
