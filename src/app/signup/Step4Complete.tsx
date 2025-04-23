@@ -1,12 +1,15 @@
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, X } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   onPrev: () => void
 }
 
 export default function Step4Complete({ onPrev }: Props) {
+  const router = useRouter()
+
   return (
     <div className="flex flex-col h-screen bg-[#0e1525] text-white relative overflow-hidden">
       {/* Header */}
@@ -41,12 +44,13 @@ export default function Step4Complete({ onPrev }: Props) {
           alt="Eye Logo"
           width={375}
           height={335}
+          className="ml-auto"
         />
       </div>
 
       {/* Next */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button onClick={() => {}}>바로 시작하기</Button>
+        <Button onClick={() => router.push('/main')}>바로 시작하기</Button>
       </section>
     </div>
   )
