@@ -34,7 +34,7 @@ export default function Step1UserType({ state, setState, onNext }: Props) {
         title="회원가입"
         right={
           <button>
-            <X size={24} />
+            <Image src="/icons/header_x.svg" alt="x" width={28} height={28} />
           </button>
         }
       />

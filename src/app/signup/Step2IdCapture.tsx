@@ -1,3 +1,4 @@
+import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import { ChevronRight, ArrowLeft, X } from 'lucide-react'
 import Image from 'next/image'
@@ -26,7 +27,25 @@ export default function Step2IdCapture({
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
-      <section className="w-full fixed top-0 flex items-center justify-between h-[56px] px-5">
+      <Header
+        title="회원가입"
+        left={
+          <button onClick={onPrev}>
+            <Image
+              src="/icons/header_back.svg"
+              alt="x"
+              width={28}
+              height={28}
+            />
+          </button>
+        }
+        right={
+          <button>
+            <Image src="/icons/header_x.svg" alt="x" width={28} height={28} />
+          </button>
+        }
+      />
+      {/* <section className="w-full fixed top-0 flex items-center justify-between h-[56px] px-5">
         <button onClick={onPrev}>
           <ArrowLeft size={24} />
         </button>
@@ -34,7 +53,7 @@ export default function Step2IdCapture({
         <button>
           <X size={24} />
         </button>
-      </section>
+      </section> */}
 
       <div className="h-[56px]" />
 
