@@ -6,9 +6,13 @@ import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { useState } from 'react'
 import UploadButton from './UploadButton'
 import DocumentPreview from './DocumentPreview'
+import { useRouter } from 'next/navigation'
+import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 
 export default function NewUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file)
@@ -18,8 +22,20 @@ export default function NewUploadPage() {
     setSelectedFile(file)
   }
 
+  const handleNext = () => {
+    // TODO: API 연동
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      router.push('/new/write')
+    }, 1500)
+  }
+
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
+      {/* 문서 읽는 중... */}
+      {loading && <ReadingDocumentOverlay />}
+
       {/* Header */}
       <Header
         title="문서 업로드"
@@ -45,7 +61,9 @@ export default function NewUploadPage() {
 
       {/* Bottom Button */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button disabled={!selectedFile}>다음</Button>
+        <Button disabled={!selectedFile || loading} onClick={handleNext}>
+          다음
+        </Button>
       </section>
     </main>
   )
