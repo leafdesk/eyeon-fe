@@ -86,7 +86,7 @@ export default function MainPage() {
 
         {/* My Page */}
         <div
-          onClick={() => router.push('/mypage')}
+          onClick={() => router.push('/my')}
           className="bg-[#1E2436] rounded-[12px] px-4 pb-4 flex flex-col items-center justify-center aspect-[10/15] border border-[#363C4E]"
         >
           <Image
