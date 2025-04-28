@@ -9,7 +9,7 @@ import DocumentPreview from '@/components/DocumentPreview'
 import { useRouter } from 'next/navigation'
 import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 
-export default function NewUploadPage() {
+export default function AnalyzeUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -27,7 +27,8 @@ export default function NewUploadPage() {
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
-      router.push('/new/write')
+      // 분석 결과 페이지로 이동 (추후 변경 가능)
+      router.push('/analyze/result')
     }, 1500)
   }
 
@@ -39,7 +40,7 @@ export default function NewUploadPage() {
       {/* Header */}
       <Header
         title="문서 업로드"
-        left="/new"
+        left="/analyze"
         leftIconType="x"
         right={<VoiceGuideToggle />}
       />
@@ -52,6 +53,7 @@ export default function NewUploadPage() {
           <UploadButton
             selectedFile={selectedFile}
             onFileSelect={handleFileSelect}
+            text="분석할 문서를 업로드해 주세요"
           />
         </div>
       )}
