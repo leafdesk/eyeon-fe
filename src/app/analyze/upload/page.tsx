@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { useState } from 'react'
 import UploadButton from '@/components/UploadButton'
 import DocumentPreview from '@/components/DocumentPreview'
@@ -42,7 +41,7 @@ export default function AnalyzeUploadPage() {
         title="문서 업로드"
         left="/analyze"
         leftIconType="x"
-        right={<VoiceGuideToggle />}
+        right="voice"
       />
 
       {/* Main Content */}

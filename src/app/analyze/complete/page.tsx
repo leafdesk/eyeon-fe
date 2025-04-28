@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -21,12 +20,12 @@ export default function AnalyzeCompletePage() {
       <CustomToast
         message="문서 다운로드 완료!"
         isVisible={showToast}
-        duration={5500}
+        duration={1500}
         onClose={() => setShowToast(false)}
       />
 
       {/* Header */}
-      <Header right={<VoiceGuideToggle />} />
+      <Header right="voice" />
 
       {/* Title */}
       <div className="text-center mt-3 mb-5 space-y-1">
@@ -63,10 +62,18 @@ export default function AnalyzeCompletePage() {
 
       {/* Action Buttons */}
       <section className="fixed bottom-0 px-5 py-3 w-full space-y-3">
-        <Button className="bg-[#FFD700]" onClick={handleDownload}>
+        <Button
+          className="bg-[#FFD700] h-[48px] text-sm"
+          onClick={handleDownload}
+        >
           문서 다운로드
         </Button>
-        <Button onClick={() => router.push('/main')}>홈으로</Button>
+        <Button
+          className="h-[48px] text-sm"
+          onClick={() => router.push('/main')}
+        >
+          홈으로
+        </Button>
       </section>
     </main>
   )

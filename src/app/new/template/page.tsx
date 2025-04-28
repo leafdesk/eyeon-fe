@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -13,7 +12,7 @@ export default function NewTemplatePage() {
   return (
     <div className="min-h-screen bg-[#0e1525] text-white flex flex-col">
       {/* Header */}
-      <Header title="문서 작성" left="/new" right={<VoiceGuideToggle />} />
+      <Header title="문서 작성" left="/new" right="voice" />
 
       {/* Heading */}
       <h1 className="text-[28px] font-normal px-6 mt-9 mb-8">

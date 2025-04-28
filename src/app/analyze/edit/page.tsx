@@ -1,7 +1,6 @@
 'use client'
 
 import Header from '@/components/Header'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import AnalysisCard from '../AnalysisCard'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
@@ -62,11 +61,7 @@ export default function AnalyzeEditPage() {
   return (
     <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
       {/* Header */}
-      <Header
-        title="문서 수정"
-        left="/analyze/result"
-        right={<VoiceGuideToggle />}
-      />
+      <Header title="문서 수정" left="/analyze/result" right="voice" />
 
       {/* Title with Pagination */}
       <section className="px-6 pt-6 pb-7 flex justify-between items-start">

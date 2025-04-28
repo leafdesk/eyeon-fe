@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import WritingDocumentOverlay from '@/components/WritingDocumentOverlay'
@@ -26,7 +25,7 @@ export default function NewWritePage() {
         title="문서 작성"
         left="/new" // TODO: router.back (capture | upload | template)
         leftIconType="x"
-        right={<VoiceGuideToggle />}
+        right="voice"
       />
 
       {/* Heading */}

@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { Download } from 'lucide-react'
 import { useState } from 'react'
 import CustomToast from '@/components/CustomToast'
@@ -26,11 +25,7 @@ export default function AISummaryPage() {
       />
 
       {/* Header */}
-      <Header
-        title="AI 문서 요약본"
-        left="/new/complete"
-        right={<VoiceGuideToggle />}
-      />
+      <Header title="AI 문서 요약본" left="/new/complete" right="voice" />
 
       {/* Content */}
       <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">

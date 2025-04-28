@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import AnalysisCard from '../AnalysisCard'
 import { useRouter } from 'next/navigation'
 
@@ -68,11 +67,7 @@ export default function AnalyzeResultPage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
-      <Header
-        title="문서 분석 결과"
-        left="/analyze/upload"
-        right={<VoiceGuideToggle />}
-      />
+      <Header title="문서 분석 결과" left="/analyze/upload" right="voice" />
 
       {/* Title */}
       <div className="p-6">

@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Download } from 'lucide-react'
 import { useState } from 'react'
 import CustomToast from '@/components/CustomToast'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 
-export default function AnalyzeAISummaryPage() {
+export default function DocAISummaryPage() {
   const router = useRouter()
+  const params = useParams()
+  const docId = params.id as string
   const [showToast, setShowToast] = useState(false)
 
   const handleDownload = () => {
@@ -25,7 +27,7 @@ export default function AnalyzeAISummaryPage() {
       />
 
       {/* Header */}
-      <Header title="AI 문서 요약본" left="/analyze/complete" right="voice" />
+      <Header title="AI 문서 요약본" left={`/docs/${docId}`} right="voice" />
 
       {/* Content */}
       <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">
@@ -182,7 +184,7 @@ export default function AnalyzeAISummaryPage() {
         </button>
         <Button
           className="flex-1 bg-white text-black py-4 rounded-md font-medium"
-          onClick={() => router.push('/analyze/complete')}
+          onClick={() => router.push(`/docs/${docId}`)}
         >
           확인
         </Button>

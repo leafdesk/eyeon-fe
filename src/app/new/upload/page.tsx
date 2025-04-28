@@ -2,7 +2,6 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import VoiceGuideToggle from '@/components/VoiceGuideToggle'
 import { useState } from 'react'
 import UploadButton from '@/components/UploadButton'
 import DocumentPreview from '@/components/DocumentPreview'
@@ -37,12 +36,7 @@ export default function NewUploadPage() {
       {loading && <ReadingDocumentOverlay />}
 
       {/* Header */}
-      <Header
-        title="문서 업로드"
-        left="/new"
-        leftIconType="x"
-        right={<VoiceGuideToggle />}
-      />
+      <Header title="문서 업로드" left="/new" leftIconType="x" right="voice" />
 
       {/* Main Content */}
       {selectedFile ? (
