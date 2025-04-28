@@ -1,9 +1,23 @@
+'use client'
+
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import VoiceGuideToggle from '@/components/VoiceGuideToggle'
-import { FileText } from 'lucide-react'
+import { useState } from 'react'
+import UploadButton from './UploadButton'
+import DocumentPreview from './DocumentPreview'
 
 export default function NewUploadPage() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file)
+  }
+
+  const handleFileChange = (file: File) => {
+    setSelectedFile(file)
+  }
+
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
@@ -15,22 +29,23 @@ export default function NewUploadPage() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full bg-[#1e2738] rounded-2xl p-6">
-          <p className="text-lg font-semibold text-center mb-5">
-            작성할 문서를 업로드해 주세요
-          </p>
-
-          <button className="w-full bg-[#FFD700] text-black py-4 rounded-[12px] flex flex-col items-center justify-center">
-            <FileText size={24} className="mb-1" />
-            <span>문서 업로드</span>
-          </button>
+      {selectedFile ? (
+        <DocumentPreview file={selectedFile} onFileChange={handleFileChange} />
+      ) : (
+        <div className="flex-1 flex items-center justify-center px-6">
+          <UploadButton
+            selectedFile={selectedFile}
+            onFileSelect={handleFileSelect}
+          />
         </div>
-      </div>
+      )}
+
+      {/* blank */}
+      <div className="h-20" />
 
       {/* Bottom Button */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button>다음</Button>
+        <Button disabled={!selectedFile}>다음</Button>
       </section>
     </main>
   )
