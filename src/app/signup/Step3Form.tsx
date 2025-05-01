@@ -1,10 +1,19 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, X } from 'lucide-react'
+import { Dispatch, SetStateAction } from 'react'
 
 interface Props {
-  state: any
-  setState: any
+  state: {
+    userType: 'regular' | 'visuallyImpaired' | null
+    idImage?: File
+    formData?: {
+      name: string
+      email: string
+      // ... 추가 필드
+    }
+  }
+  setState: Dispatch<SetStateAction<any>>
   onPrev: () => void
   onNext: () => void
 }

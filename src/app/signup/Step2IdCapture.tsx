@@ -9,7 +9,6 @@ import { Dispatch } from 'react'
 interface Props {
   state: {
     userType: 'regular' | 'visuallyImpaired' | null
-    voiceGuidance: boolean
   }
   setState: Dispatch<SetStateAction<any>>
   onPrev: () => void

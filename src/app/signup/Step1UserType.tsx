@@ -6,25 +6,28 @@ import { Switch } from '@/components/ui/switch'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import Header from '@/components/Header'
+import { useAtom } from 'jotai'
+import { voiceGuideAtom } from '@/atoms/userSettingsAtom'
 
 interface Props {
   state: {
     userType: 'regular' | 'visuallyImpaired' | null
-    voiceGuidance: boolean
   }
   setState: Dispatch<SetStateAction<any>>
   onNext: () => void
 }
 
 export default function Step1UserType({ state, setState, onNext }: Props) {
-  const { userType, voiceGuidance } = state
+  const { userType } = state
+  const [voiceGuidance, setVoiceGuidance] = useAtom(voiceGuideAtom)
 
   const handleUserTypeChange = (type: 'regular' | 'visuallyImpaired') => {
     setState((prev: any) => ({ ...prev, userType: type }))
   }
 
+  // Voice guidance is now handled by the global atom
   const handleVoiceChange = (val: boolean) => {
-    setState((prev: any) => ({ ...prev, voiceGuidance: val }))
+    setVoiceGuidance(val)
   }
 
   return (

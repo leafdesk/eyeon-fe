@@ -11,7 +11,6 @@ type UserType = 'regular' | 'visuallyImpaired' | null
 
 interface SignupState {
   userType: UserType
-  voiceGuidance: boolean
   idImage?: File
   formData?: {
     name: string
@@ -27,7 +26,6 @@ export default function SignupScreen() {
   const [step, setStep] = useState(1)
   const [signupState, setSignupState] = useState<SignupState>({
     userType: null,
-    voiceGuidance: true,
   })
   const [isCapturing, setIsCapturing] = useState(false)
 
