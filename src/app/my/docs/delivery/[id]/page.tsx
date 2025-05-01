@@ -58,9 +58,9 @@ export default function DeliveryDocPage() {
         </Button>
         <Button
           className="h-[48px] text-sm"
-          onClick={() => router.push(`/my/docs/delivery/${docId}/ai`)}
+          onClick={() => router.push('/new/write')}
         >
-          AI 문서 요약본
+          문서 작성하기
         </Button>
       </section>
     </main>

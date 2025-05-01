@@ -101,6 +101,9 @@ export default function MainPage() {
           </span>
         </div>
       </div>
+
+      {/* blank */}
+      <div className="h-16" />
     </div>
   )
 }
