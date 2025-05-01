@@ -116,7 +116,7 @@ export default function CameraCapture({
   return (
     <main
       className="flex flex-col min-h-screen relative overflow-hidden"
-      onClick={takePicture}
+      // onClick={takePicture}
     >
       {/* 카메라 비디오 배경 */}
       <video
