@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/api' // realApi 또는 mockApi 둘 다 export된 모듈
 import type { AxiosError } from 'axios'
 import type { ApiResponse } from '@/lib/api-types'
 import type { LoginResponseData } from '@/lib/api-types'
 
-export default function KakaoOAuthCallback() {
+// 실제 로그인 처리 컴포넌트
+function KakaoCallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get('code')
@@ -65,4 +66,13 @@ export default function KakaoOAuthCallback() {
     return <p style={{ color: 'red' }}>에러: {error}</p>
   }
   return <p>로그인 처리 중…</p>
+}
+
+// 메인 페이지 컴포넌트 - Suspense로 감싸서 export
+export default function KakaoOAuthCallback() {
+  return (
+    <Suspense fallback={<p>로딩 중...</p>}>
+      <KakaoCallbackContent />
+    </Suspense>
+  )
 }
