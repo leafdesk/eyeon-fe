@@ -16,7 +16,7 @@ export default function KakaoLoginButton() {
 
     window.Kakao.Auth.authorize({
       redirectUri: `${window.location.origin}/oauth/kakao`,
-      throughTalk: true, // 카카오톡 앱으로 시도
+      // throughTalk: true, // 카카오톡 앱으로 시도
     })
   }
 
