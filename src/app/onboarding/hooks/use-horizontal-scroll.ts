@@ -135,7 +135,7 @@ export function useHorizontalScroll({
       setCurrentFrame(0)
       isInitializedRef.current = true
     }
-  }, [containerRef.current])
+  }, [])
 
   return {
     currentFrame,
@@ -145,5 +145,5 @@ export function useHorizontalScroll({
     prevFrame,
     isFirstFrame,
     isLastFrame,
-  }
+  } as UseHorizontalScrollReturn
 }
