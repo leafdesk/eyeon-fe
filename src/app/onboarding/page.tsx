@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useHorizontalScroll } from './hooks/use-horizontal-scroll'
 import { ReactNode, useEffect, useState } from 'react'
+import KakaoLoginButton from '@/components/KakaoLoginButton'
 
 // 커스텀 타입 정의
 interface OnboardingFrame {
@@ -173,14 +174,7 @@ export default function OnboardingPage() {
 
       {/* Fixed button at bottom */}
       <div className="absolute bottom-0 left-0 right-0 px-5 py-3 z-10 bg-[#0F1626]">
-        <Button
-          variant="primary"
-          onClick={handleStartClick}
-          className="flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500"
-        >
-          <span className="w-5 h-5 rounded-full bg-black"></span>
-          카카오 계정으로 시작하기
-        </Button>
+        <KakaoLoginButton />
       </div>
 
       {/* Custom styles for hiding scrollbar */}
