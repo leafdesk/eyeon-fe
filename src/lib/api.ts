@@ -21,7 +21,7 @@ const getToken = (): string | null => {
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://3.38.124.50:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },

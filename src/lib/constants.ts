@@ -1,7 +1,7 @@
 /**
  * API 모킹 여부
  */
-export const USE_API_MOCK = true
+export const USE_API_MOCK = false
 
 /**
  * 양식 타입 상수

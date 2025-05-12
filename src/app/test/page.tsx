@@ -66,7 +66,7 @@ export default function TestPage() {
       const userData: SignUpRequest = {
         name: '홍길동',
         kakaoId: 12345678,
-        residentNumber: '000000-0000000',
+        residentNumber: '001008-3001234',
         residentDate: '2020-01-01',
         phoneNumber: '010-1234-5678',
         address: '서울특별시 강남구 테헤란로 123',
