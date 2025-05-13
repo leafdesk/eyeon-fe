@@ -246,11 +246,7 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
 
       {/* Next */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button
-          onClick={handleSignUp}
-          disabled={isLoading}
-          className="w-full bg-[#FFD700] text-[#0F1626] hover:bg-[#E6C200]"
-        >
+        <Button onClick={handleSignUp} disabled={isLoading}>
           {isLoading ? '처리 중...' : '회원가입'}
         </Button>
       </section>
