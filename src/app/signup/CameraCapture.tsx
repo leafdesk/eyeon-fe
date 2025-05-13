@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState, useLayoutEffect } from 'react'
+import api from '@/lib/api'
 
 export default function CameraCapture({
   onNext,
@@ -105,7 +106,52 @@ export default function CameraCapture({
       (blob) => {
         if (blob) {
           const file = new File([blob], 'id-card.jpg', { type: 'image/jpeg' })
-          onCapture(file)
+
+          // 이미지 파일로 주민등록증 정보 API 호출
+          /* 실제 구현 (테스트를 위해 주석 처리)
+          api.auth.getResidentInfo(file)
+            .then(response => {
+              console.log('주민등록증 인식 성공:', response.data)
+            })
+            .catch(error => {
+              console.error('주민등록증 인식 실패:', error)
+            })
+            .finally(() => {
+              // API 호출 여부와 상관없이 캡처한 파일을 상위 컴포넌트로 전달
+              onCapture(file)
+            })
+          */
+
+          // 테스트용 코드: 샘플 이미지로 API 호출
+          console.log(
+            '테스트 이미지 불러오기 시작: /images/id_card_example.jpg',
+          )
+          fetch('/images/id_card_example.jpg')
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(
+                  `이미지 로드 실패: ${res.status} ${res.statusText}`,
+                )
+              }
+              return res.blob()
+            })
+            .then((imageBlob) => {
+              console.log('테스트 이미지 로드 성공, 크기:', imageBlob.size)
+              const testFile = new File([imageBlob], 'id_card_example.jpg', {
+                type: 'image/jpeg',
+              })
+              return api.auth.getResidentInfo(testFile)
+            })
+            .then((response) => {
+              console.log('테스트 주민등록증 인식 성공:', response.data)
+            })
+            .catch((error) => {
+              console.error('테스트 주민등록증 인식 실패:', error)
+            })
+            .finally(() => {
+              // 실제 캡처된 파일은 그대로 상위 컴포넌트로 전달
+              onCapture(file)
+            })
         }
       },
       'image/jpeg',
@@ -116,7 +162,7 @@ export default function CameraCapture({
   return (
     <main
       className="flex flex-col min-h-screen relative overflow-hidden"
-      // onClick={takePicture}
+      onClick={takePicture}
     >
       {/* 카메라 비디오 배경 */}
       <video
