@@ -2,6 +2,9 @@ import { Button } from '@/components/ui/button'
 import { ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import api from '@/lib/api'
+import { ResidentResponseData } from '@/lib/api-types'
+import { useSetAtom } from 'jotai'
+import { residentInfoAtom, signupFormAtom } from '@/atoms/residentInfoAtom'
 
 export default function CameraCapture({
   onNext,
@@ -18,6 +21,9 @@ export default function CameraCapture({
   const containerRef = useRef<HTMLDivElement>(null)
   const [streamActive, setStreamActive] = useState(false)
   const [frameRect, setFrameRect] = useState<DOMRect | null>(null)
+  // Jotai atom setter
+  const setResidentInfo = useSetAtom(residentInfoAtom)
+  const setSignupForm = useSetAtom(signupFormAtom)
   // 네모 UI 테두리 두께와 border-radius 값
   const borderWidth = 4
   const borderRadius = 6
@@ -107,11 +113,24 @@ export default function CameraCapture({
         if (blob) {
           const file = new File([blob], 'id-card.jpg', { type: 'image/jpeg' })
 
-          // 이미지 파일로 주민등록증 정보 API 호출
           /* 실제 구현 (테스트를 위해 주석 처리)
           api.auth.getResidentInfo(file)
             .then(response => {
               console.log('주민등록증 인식 성공:', response.data)
+              
+              // 인식된 데이터 저장
+              const residentData = response.data
+              setResidentInfo(residentData)
+              
+              // 회원가입 폼에 필요한 데이터 설정
+              setSignupForm({
+                name: residentData.name,
+                residentNumber: residentData.residentNumber,
+                address: residentData.address,
+                detailAddress: '',
+                phoneNumber: '',
+                email: ''
+              })
             })
             .catch(error => {
               console.error('주민등록증 인식 실패:', error)
@@ -144,6 +163,22 @@ export default function CameraCapture({
             })
             .then((response) => {
               console.log('테스트 주민등록증 인식 성공:', response.data)
+
+              // 실제 API 응답 데이터 사용
+              const residentData = response.data.data
+
+              // 인식된 데이터 저장
+              setResidentInfo(residentData)
+
+              // 회원가입 폼에 필요한 데이터 설정
+              setSignupForm({
+                name: residentData.name,
+                residentNumber: residentData.residentNumber,
+                address: residentData.address,
+                detailAddress: '',
+                phoneNumber: '',
+                email: '',
+              })
             })
             .catch((error) => {
               console.error('테스트 주민등록증 인식 실패:', error)
