@@ -42,7 +42,7 @@ function KakaoCallbackContent() {
 
         if (
           resp?.code === 'USER_NOT_FOUND_404' ||
-          resp?.code === 'USER_SIGN_UP_REQUIRED_404'
+          resp?.code === 'SIGN_UP_REQUIRED_404'
         ) {
           // 2) 신규 사용자: /signup 으로 이동, 필요한 정보 쿼리로 전달
           const { email, kakaoId, profileImageUrl } = resp.data
