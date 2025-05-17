@@ -6,7 +6,7 @@ import { useAtomValue } from 'jotai'
 import { residentInfoAtom, signupFormAtom } from '@/atoms/residentInfoAtom'
 import api from '@/lib/api'
 import { SignUpRequest } from '@/lib/api-types'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 // 토스트 컴포넌트가 없는 경우 alert로 대체
 
 interface Props {
@@ -33,6 +33,8 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
 
   // 라우터 가져오기
   const router = useRouter()
+  // URL 파라미터 가져오기
+  const searchParams = useSearchParams()
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(false)
@@ -47,6 +49,13 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
     email: '',
   })
 
+  // URL에서 파라미터 가져오기
+  const emailParam = searchParams.get('email') || ''
+  const kakaoIdParam = searchParams.get('kakaoId')
+    ? Number(searchParams.get('kakaoId'))
+    : undefined
+  const profileImageUrlParam = searchParams.get('profileImageUrl') || ''
+
   // 신분증 인식 결과가 있으면 폼 자동 채우기
   useEffect(() => {
     if (signupForm) {
@@ -56,10 +65,16 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
         residentNumber: signupForm.residentNumber || '',
         name: signupForm.name || '',
         phoneNumber: signupForm.phoneNumber || '',
-        email: signupForm.email || '',
+        email: emailParam || signupForm.email || '',
       })
+    } else {
+      // signupForm이 없을 경우 URL 파라미터의 email만 설정
+      setFormValues((prev) => ({
+        ...prev,
+        email: emailParam || prev.email,
+      }))
     }
-  }, [signupForm])
+  }, [signupForm, emailParam])
 
   // 입력 필드 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +103,7 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
       }
 
       // kakaoId와 프로필 이미지가 없으면 에러
-      if (!state.kakaoId || !state.profileImageUrl) {
+      if (!kakaoIdParam || !profileImageUrlParam) {
         alert('카카오 인증 정보가 없습니다. 처음부터 다시 시도해주세요.')
         return
       }
@@ -96,20 +111,22 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
       // 회원가입 요청 데이터 구성
       const signUpData: SignUpRequest = {
         name: formValues.name,
-        kakaoId: state.kakaoId,
+        kakaoId: kakaoIdParam,
         residentNumber: formValues.residentNumber,
-        residentDate: residentInfo?.residentDate || '',
+        residentDate: residentInfo?.residentDate || '2018-07-23',
         phoneNumber: formValues.phoneNumber,
         address:
           formValues.address +
           (formValues.detailAddress ? ` ${formValues.detailAddress}` : ''),
         email: formValues.email,
-        profileImageUrl: state.profileImageUrl,
+        profileImageUrl: profileImageUrlParam,
         isBlind: state.userType === 'visuallyImpaired' ? 'TRUE' : 'FALSE',
       }
 
+      console.log('signUpData:', signUpData)
       // 회원가입 API 호출
       const response = await api.auth.signUp(signUpData)
+      console.log('response:', response)
 
       // 응답 처리
       if (response.data.isSuccess) {
