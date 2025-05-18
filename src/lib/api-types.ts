@@ -64,7 +64,36 @@ export interface FormData {
   formId: number
   name: string
   createdAt: string
-  formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT'
+  formType:
+    | 'RESUME'
+    | 'CERTIFICATE'
+    | 'CONSENT'
+    | 'SELF_INTRO'
+    | 'REPORT'
+    | 'EMPLOYMENT'
+    | 'INTRODUCTION'
+    | 'LEASE'
   formSize: number
   formUrl: string
+}
+
+export interface UploadFormResponseData {
+  formId: number
+  name: string
+  formSize: number
+  formUrl: string
+}
+
+export interface DocumentData {
+  documentId: number
+  name: string
+  createdAt: string
+  documentType: 'LEASE' | 'SELF_INTRO' | 'RESUME' | string
+  documentSize: number
+  documentUrl: string
+}
+
+export interface DocumentSummaryData {
+  summaryText: string
+  pdfFileUrl: string
 }

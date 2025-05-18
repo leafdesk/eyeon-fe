@@ -8,6 +8,9 @@ import type {
   FormData as ApiFormData,
   SignUpRequest,
   UserModifyRequest,
+  UploadFormResponseData,
+  DocumentData,
+  DocumentSummaryData,
 } from './api-types'
 
 /**
@@ -62,7 +65,7 @@ const formMockData: ApiFormData[] = [
     formId: 1,
     name: '표준 근로계약서',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.EMPLOYMENT,
+    formType: FORM_TYPES.RESUME,
     formSize: 128000,
     formUrl: 'https://example.com/forms/1',
   },
@@ -70,7 +73,7 @@ const formMockData: ApiFormData[] = [
     formId: 2,
     name: '자기소개서 양식',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.INTRODUCTION,
+    formType: FORM_TYPES.CERTIFICATE,
     formSize: 78000,
     formUrl: 'https://example.com/forms/2',
   },
@@ -78,7 +81,7 @@ const formMockData: ApiFormData[] = [
     formId: 3,
     name: '주택 임대차 계약서',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.LEASE,
+    formType: FORM_TYPES.CONSENT,
     formSize: 156000,
     formUrl: 'https://example.com/forms/3',
   },
@@ -86,7 +89,7 @@ const formMockData: ApiFormData[] = [
     formId: 4,
     name: '아르바이트 근로계약서',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.EMPLOYMENT,
+    formType: FORM_TYPES.SELF_INTRO,
     formSize: 96000,
     formUrl: 'https://example.com/forms/4',
   },
@@ -94,7 +97,7 @@ const formMockData: ApiFormData[] = [
     formId: 5,
     name: '졸업 자기소개서',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.INTRODUCTION,
+    formType: FORM_TYPES.REPORT,
     formSize: 64000,
     formUrl: 'https://example.com/forms/5',
   },
@@ -102,9 +105,39 @@ const formMockData: ApiFormData[] = [
     formId: 6,
     name: '월세 계약서',
     createdAt: new Date().toISOString(),
-    formType: FORM_TYPES.LEASE,
+    formType: FORM_TYPES.REPORT,
     formSize: 112000,
     formUrl: 'https://example.com/forms/6',
+  },
+]
+
+/**
+ * 문서 데이터 Mock
+ */
+const documentMockData: DocumentData[] = [
+  {
+    documentId: 1,
+    name: '자기소개서_홍길동.pdf',
+    createdAt: new Date().toISOString(),
+    documentType: FORM_TYPES.SELF_INTRO,
+    documentSize: 215000,
+    documentUrl: 'https://example.com/documents/1',
+  },
+  {
+    documentId: 2,
+    name: '임대차계약서_2023.pdf',
+    createdAt: new Date().toISOString(),
+    documentType: FORM_TYPES.CONSENT,
+    documentSize: 320000,
+    documentUrl: 'https://example.com/documents/2',
+  },
+  {
+    documentId: 3,
+    name: '이력서_홍길동.pdf',
+    createdAt: new Date().toISOString(),
+    documentType: FORM_TYPES.RESUME,
+    documentSize: 180000,
+    documentUrl: 'https://example.com/documents/3',
   },
 ]
 
@@ -127,6 +160,54 @@ export function getFormDetailMock(formId: number) {
 
   if (form) {
     return createApiResponse(form)
+  }
+
+  return createApiResponse(null, false)
+}
+
+/**
+ * 문서 업로드 응답 Mock
+ */
+export const uploadFormResponseMock = createApiResponse<UploadFormResponseData>(
+  {
+    formId: 7,
+    name: '업로드된_문서.pdf',
+    formSize: 250000,
+    formUrl: 'https://example.com/forms/7',
+  },
+)
+
+/**
+ * 문서 목록 조회 Mock 함수
+ */
+export function getDocumentListMock() {
+  return createApiResponse(documentMockData)
+}
+
+/**
+ * 문서 상세 조회 Mock 함수
+ */
+export function getDocumentDetailMock(documentId: number) {
+  const document = documentMockData.find((doc) => doc.documentId === documentId)
+
+  if (document) {
+    return createApiResponse(document)
+  }
+
+  return createApiResponse(null, false)
+}
+
+/**
+ * 문서 요약 조회 Mock 함수
+ */
+export function getDocumentSummaryMock(documentId: number) {
+  const document = documentMockData.find((doc) => doc.documentId === documentId)
+
+  if (document) {
+    return createApiResponse<DocumentSummaryData>({
+      summaryText: `${document.name}에 대한 요약 내용입니다. 이 문서는 ${document.documentType} 유형의 문서로 주요 내용이 포함되어 있습니다.`,
+      pdfFileUrl: document.documentUrl,
+    })
   }
 
   return createApiResponse(null, false)
@@ -178,5 +259,18 @@ export const mockApi = {
 
     getDetail: (formId: number) =>
       Promise.resolve(wrapInAxiosResponse(getFormDetailMock(formId))),
+
+    uploadForm: (file: File) =>
+      Promise.resolve(wrapInAxiosResponse(uploadFormResponseMock)),
+  },
+
+  document: {
+    getSummary: (documentId: number) =>
+      Promise.resolve(wrapInAxiosResponse(getDocumentSummaryMock(documentId))),
+
+    getList: () => Promise.resolve(wrapInAxiosResponse(getDocumentListMock())),
+
+    getDetail: (documentId: number) =>
+      Promise.resolve(wrapInAxiosResponse(getDocumentDetailMock(documentId))),
   },
 }

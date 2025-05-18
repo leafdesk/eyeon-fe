@@ -9,6 +9,9 @@ import type {
   ResidentResponseData,
   UserInfoData,
   FormData as ApiFormData,
+  UploadFormResponseData,
+  DocumentData,
+  DocumentSummaryData,
 } from './api-types'
 
 // 토큰 가져오기 함수
@@ -132,7 +135,7 @@ const realApi = {
 
     /**
      * 문서 양식 목록 조회
-     * @param formType 양식 타입 (EMPLOYMENT, INTRODUCTION, LEASE)
+     * @param formType 양식 타입
      */
     getList: (
       formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT',
@@ -140,6 +143,49 @@ const realApi = {
       apiClient.get<ApiResponse<ApiFormData[]>>('/form/list', {
         params: { formType },
       }),
+
+    /**
+     * 문서 양식 업로드
+     * @param file 업로드할 문서 파일
+     */
+    uploadForm: (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      return apiClient.post<ApiResponse<UploadFormResponseData>>(
+        '/form',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+    },
+  },
+
+  // 문서 관련 API
+  document: {
+    /**
+     * 문서 요약 조회
+     * @param documentId 문서 ID
+     */
+    getSummary: (documentId: number) =>
+      apiClient.get<ApiResponse<DocumentSummaryData>>(
+        `/document/${documentId}/summary`,
+      ),
+
+    /**
+     * 문서 리스트 조회
+     */
+    getList: () => apiClient.get<ApiResponse<DocumentData[]>>(`/document/list`),
+
+    /**
+     * 문서 상세 조회
+     * @param documentId 문서 ID
+     */
+    getDetail: (documentId: number) =>
+      apiClient.get<ApiResponse<DocumentData>>(`/${documentId}/detail`),
   },
 }
 
