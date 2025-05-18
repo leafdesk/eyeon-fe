@@ -185,7 +185,9 @@ const realApi = {
      * @param documentId 문서 ID
      */
     getDetail: (documentId: number) =>
-      apiClient.get<ApiResponse<DocumentData>>(`/${documentId}/detail`),
+      apiClient.get<ApiResponse<DocumentData>>(
+        `/document/detail?documentId=${documentId}`,
+      ),
   },
 }
 
