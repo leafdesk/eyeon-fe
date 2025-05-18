@@ -56,7 +56,7 @@ export async function updateUserInfo(data: {
 
 // 양식 목록 조회 예시
 export async function fetchFormList(
-  formType: 'EMPLOYMENT' | 'INTRODUCTION' | 'LEASE',
+  formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT',
 ) {
   return handleApiResponse(
     api.form.getList(formType),
