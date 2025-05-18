@@ -113,7 +113,7 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
         name: formValues.name,
         kakaoId: kakaoIdParam,
         residentNumber: formValues.residentNumber,
-        residentDate: residentInfo?.residentDate || '2018-07-23',
+        residentDate: residentInfo?.residentDate || '2001-01-01',
         phoneNumber: formValues.phoneNumber,
         address:
           formValues.address +
@@ -139,7 +139,7 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
         alert('회원가입이 완료되었습니다.')
 
         // 메인 페이지로 이동
-        router.push('/')
+        router.push('/main')
       } else {
         // 서버에서 반환한 오류 메시지 표시
         alert(response.data.message || '회원가입 중 오류가 발생했습니다.')
@@ -192,7 +192,7 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
               className="w-full bg-[#1e2738] text-gray-300 p-4 pr-20 rounded-md"
               value={formValues.address}
               onChange={handleChange}
-              readOnly
+              // readOnly
             />
             <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs">
               주소 검색

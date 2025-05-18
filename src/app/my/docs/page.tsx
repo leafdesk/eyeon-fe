@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation'
 // 문서 양식 데이터
 const docTemplates = [
   { id: 1, title: '이력서', route: '/my/docs/resume' },
-  { id: 2, title: '근로계약서', route: '/my/docs/employment' },
-  { id: 3, title: '택배송장', route: '/my/docs/delivery' },
-  { id: 4, title: '임대차계약서', route: '/my/docs/lease' },
+  { id: 2, title: '재직증명서', route: '/my/docs/certificate' },
+  { id: 3, title: '위임장', route: '/my/docs/consent' },
+  { id: 4, title: '자기소개서', route: '/my/docs/self-intro' },
+  { id: 5, title: '일일업무일지', route: '/my/docs/report' },
 ]
 
 export default function MyDocsPage() {

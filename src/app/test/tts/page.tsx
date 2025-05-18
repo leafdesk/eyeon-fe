@@ -1,5 +1,7 @@
 'use client'
 
+import { TTSOverlay } from './TTSOverlay'
+// import BackupTTS from './backup'
 import { TTSPlayer } from './TTSPlayer'
 
 export default function TTSTestPage() {
@@ -7,7 +9,13 @@ export default function TTSTestPage() {
 
   return (
     <div>
-      <TTSPlayer text={text} autoPlay={true} />
+      {/* <TTSPlayer text={text} autoPlay={true} /> */}
+      <TTSOverlay
+        text={text}
+        // autoPlay={false}
+      />
+
+      {/* <BackupTTS /> */}
     </div>
   )
 }

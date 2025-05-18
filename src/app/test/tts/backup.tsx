@@ -12,7 +12,7 @@ interface Voice {
   voiceURI: string
 }
 
-export default function TTSTestPage() {
+export default function BackupTTS() {
   const [text, setText] = useState<string>(
     '안녕하세요. 음성 합성 테스트입니다.',
   )

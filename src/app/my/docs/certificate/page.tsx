@@ -1,7 +1,7 @@
 'use client'
 
 import Header from '@/components/Header'
-import DocItem from '../MyDocItem'
+import MyDocItem from '../MyDocItem'
 import { useRouter } from 'next/navigation'
 
 // 문서 데이터 샘플
@@ -26,11 +26,11 @@ const documents = [
   },
 ]
 
-export default function LeasePage() {
+export default function CertificatePage() {
   const router = useRouter()
 
   const handleDocClick = (id: number) => {
-    router.push(`/my/docs/lease/${id}`)
+    router.push(`/my/docs/certificate/${id}`)
   }
 
   return (
@@ -40,13 +40,13 @@ export default function LeasePage() {
 
       {/* Title */}
       <div className="px-6 pt-9 pb-6">
-        <h1 className="text-[28px] font-semibold">임대차계약서</h1>
+        <h1 className="text-[28px] font-semibold">재직증명서</h1>
       </div>
 
       {/* Document List */}
       <div className="space-y-3 px-5">
         {documents.map((doc) => (
-          <DocItem
+          <MyDocItem
             key={doc.id}
             title={doc.title}
             date={doc.date}

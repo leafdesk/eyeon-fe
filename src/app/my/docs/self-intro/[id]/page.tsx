@@ -7,7 +7,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useState } from 'react'
 import CustomToast from '@/components/CustomToast'
 
-export default function DeliveryDocPage() {
+export default function SelfIntroDocPage() {
   const router = useRouter()
   const params = useParams()
   const docId = params.id as string
@@ -27,11 +27,11 @@ export default function DeliveryDocPage() {
       />
 
       {/* Header */}
-      <Header title="내 문서 양식" right="voice" left="/my/docs/delivery" />
+      <Header title="내 문서 양식" right="voice" left="/my/docs/self-intro" />
 
       {/* Title */}
       <div className="text-center pt-6 pb-4">
-        <h1 className="text-lg font-semibold mb-4">택배송장</h1>
+        <h1 className="text-lg font-semibold mb-4">자기소개서</h1>
         <p className="text-white text-sm mb-1">문서 제목</p>
         <p className="text-[#9B9B9B] text-sm">
           0000.00.00 <span className="mx-[4px] text-[#363C4E]">|</span> 00.0MB

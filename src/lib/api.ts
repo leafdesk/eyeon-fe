@@ -136,7 +136,9 @@ const realApi = {
      * 문서 양식 목록 조회
      * @param formType 양식 타입 (EMPLOYMENT, INTRODUCTION, LEASE)
      */
-    getList: (formType: 'EMPLOYMENT' | 'INTRODUCTION' | 'LEASE') =>
+    getList: (
+      formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT',
+    ) =>
       apiClient.get<ApiResponse<ApiFormData[]>>('/form/list', {
         params: { formType },
       }),
