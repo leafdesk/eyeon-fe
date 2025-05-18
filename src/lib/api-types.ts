@@ -64,7 +64,7 @@ export interface FormData {
   formId: number
   name: string
   createdAt: string
-  formType: 'EMPLOYMENT' | 'INTRODUCTION' | 'LEASE'
+  formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT'
   formSize: number
   formUrl: string
 }

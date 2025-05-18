@@ -128,9 +128,7 @@ const realApi = {
      * @param formId 양식 ID
      */
     getDetail: (formId: number) =>
-      apiClient.get<ApiResponse<ApiFormData>>('/form/detail', {
-        params: { formId },
-      }),
+      apiClient.get<ApiResponse<ApiFormData>>(`/form/${formId}/detail`),
 
     /**
      * 문서 양식 목록 조회

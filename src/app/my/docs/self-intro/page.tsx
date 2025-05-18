@@ -3,34 +3,62 @@
 import Header from '@/components/Header'
 import MyDocItem from '../MyDocItem'
 import { useRouter } from 'next/navigation'
-
-// 문서 데이터 샘플
-const documents = [
-  {
-    id: 1,
-    title: '문서 이름',
-    date: '0000.00.00',
-    size: '00.0MB',
-  },
-  {
-    id: 2,
-    title: '문서 이름',
-    date: '0000.00.00',
-    size: '00.0MB',
-  },
-  {
-    id: 3,
-    title: '문서 이름',
-    date: '0000.00.00',
-    size: '00.0MB',
-  },
-]
+import { useEffect, useState } from 'react'
+import api from '@/lib/api'
+import { FormData } from '@/lib/api-types'
+import { FORM_TYPES } from '@/lib/constants'
 
 export default function SelfIntroPage() {
   const router = useRouter()
+  const [documents, setDocuments] = useState<FormData[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // API에서 자기소개서 목록 가져오기
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await api.form.getList(FORM_TYPES.SELF_INTRO)
+
+        if (response.data.isSuccess) {
+          setDocuments(response.data.data)
+        } else {
+          setError(
+            response.data.message || '데이터를 불러오는 데 실패했습니다.',
+          )
+        }
+      } catch (err) {
+        console.error('자기소개서 목록 조회 오류:', err)
+        setError(
+          '자기소개서 목록을 불러오는 데 실패했습니다. 다시 시도해주세요.',
+        )
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDocuments()
+  }, [])
 
   const handleDocClick = (id: number) => {
     router.push(`/my/docs/self-intro/${id}`)
+  }
+
+  // 파일 크기를 MB 단위로 변환하는 함수
+  const formatFileSize = (bytes: number) => {
+    const mb = bytes / (1024 * 1024)
+    return mb.toFixed(1) + 'MB'
+  }
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}.${month}.${day}`
   }
 
   return (
@@ -45,15 +73,25 @@ export default function SelfIntroPage() {
 
       {/* Document List */}
       <div className="space-y-3 px-5">
-        {documents.map((doc) => (
-          <MyDocItem
-            key={doc.id}
-            title={doc.title}
-            date={doc.date}
-            size={doc.size}
-            onClick={() => handleDocClick(doc.id)}
-          />
-        ))}
+        {isLoading ? (
+          <div className="text-center py-10 text-gray-400">로딩 중...</div>
+        ) : error ? (
+          <div className="text-center py-10 text-red-400">{error}</div>
+        ) : documents.length === 0 ? (
+          <div className="text-center py-10 text-gray-400">
+            문서가 없습니다.
+          </div>
+        ) : (
+          documents.map((doc) => (
+            <MyDocItem
+              key={doc.formId}
+              title={doc.name}
+              date={formatDate(doc.createdAt)}
+              size={formatFileSize(doc.formSize)}
+              onClick={() => handleDocClick(doc.formId)}
+            />
+          ))
+        )}
       </div>
 
       {/* blank */}

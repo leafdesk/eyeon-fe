@@ -123,7 +123,7 @@ export default function TestPage() {
   }
 
   const handleGetFormList = async (
-    formType: 'EMPLOYMENT' | 'INTRODUCTION' | 'LEASE',
+    formType: 'RESUME' | 'CERTIFICATE' | 'CONSENT' | 'SELF_INTRO' | 'REPORT',
   ) => {
     try {
       setLoading(`formlist-${formType}`)
@@ -220,32 +220,52 @@ export default function TestPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Button
             variant="primary"
-            onClick={() => handleGetFormList(FORM_TYPES.EMPLOYMENT)}
-            disabled={loading === `formlist-${FORM_TYPES.EMPLOYMENT}`}
+            onClick={() => handleGetFormList(FORM_TYPES.RESUME)}
+            disabled={loading === `formlist-${FORM_TYPES.RESUME}`}
           >
-            {loading === `formlist-${FORM_TYPES.EMPLOYMENT}`
+            {loading === `formlist-${FORM_TYPES.RESUME}`
               ? '처리 중...'
-              : '근로계약서 양식 목록 조회'}
+              : '이력서 양식 목록 조회'}
           </Button>
 
           <Button
             variant="primary"
-            onClick={() => handleGetFormList(FORM_TYPES.INTRODUCTION)}
-            disabled={loading === `formlist-${FORM_TYPES.INTRODUCTION}`}
+            onClick={() => handleGetFormList(FORM_TYPES.CERTIFICATE)}
+            disabled={loading === `formlist-${FORM_TYPES.CERTIFICATE}`}
           >
-            {loading === `formlist-${FORM_TYPES.INTRODUCTION}`
+            {loading === `formlist-${FORM_TYPES.CERTIFICATE}`
+              ? '처리 중...'
+              : '재직증명서 양식 목록 조회'}
+          </Button>
+
+          <Button
+            variant="primary"
+            onClick={() => handleGetFormList(FORM_TYPES.CONSENT)}
+            disabled={loading === `formlist-${FORM_TYPES.CONSENT}`}
+          >
+            {loading === `formlist-${FORM_TYPES.CONSENT}`
+              ? '처리 중...'
+              : '위임장 양식 목록 조회'}
+          </Button>
+
+          <Button
+            variant="primary"
+            onClick={() => handleGetFormList(FORM_TYPES.SELF_INTRO)}
+            disabled={loading === `formlist-${FORM_TYPES.SELF_INTRO}`}
+          >
+            {loading === `formlist-${FORM_TYPES.SELF_INTRO}`
               ? '처리 중...'
               : '자기소개서 양식 목록 조회'}
           </Button>
 
           <Button
             variant="primary"
-            onClick={() => handleGetFormList(FORM_TYPES.LEASE)}
-            disabled={loading === `formlist-${FORM_TYPES.LEASE}`}
+            onClick={() => handleGetFormList(FORM_TYPES.REPORT)}
+            disabled={loading === `formlist-${FORM_TYPES.REPORT}`}
           >
-            {loading === `formlist-${FORM_TYPES.LEASE}`
+            {loading === `formlist-${FORM_TYPES.REPORT}`
               ? '처리 중...'
-              : '임대차계약서 양식 목록 조회'}
+              : '일일업무일지 양식 목록 조회'}
           </Button>
 
           <Button

@@ -7,9 +7,11 @@ export const USE_API_MOCK = false
  * 양식 타입 상수
  */
 export const FORM_TYPES = {
-  EMPLOYMENT: 'EMPLOYMENT',
-  INTRODUCTION: 'INTRODUCTION',
-  LEASE: 'LEASE',
+  RESUME: 'RESUME',
+  CERTIFICATE: 'CERTIFICATE',
+  CONSENT: 'CONSENT',
+  SELF_INTRO: 'SELF_INTRO',
+  REPORT: 'REPORT',
 } as const
 
 /**
