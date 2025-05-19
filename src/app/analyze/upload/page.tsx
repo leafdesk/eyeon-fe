@@ -3,10 +3,11 @@
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import UploadButton from '@/components/UploadButton'
-import DocumentPreview from '@/components/DocumentPreview'
+import UploadButton from '@/app/new/upload/UploadButton'
+import DocumentPreview from '@/app/new/upload/DocumentPreview'
 import { useRouter } from 'next/navigation'
 import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
+import api from '@/lib/api'
 
 export default function AnalyzeUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -21,14 +22,21 @@ export default function AnalyzeUploadPage() {
     setSelectedFile(file)
   }
 
-  const handleNext = () => {
-    // TODO: API 연동
+  const handleNext = async () => {
+    if (!selectedFile) return
+
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      // 분석 결과 페이지로 이동 (추후 변경 가능)
+
+    try {
+      const response = await api.form.uploadForm(selectedFile)
+      console.log('업로드 성공:', response.data)
       router.push('/analyze/result')
-    }, 1500)
+    } catch (error) {
+      console.error('파일 업로드 실패:', error)
+      alert('파일 업로드에 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

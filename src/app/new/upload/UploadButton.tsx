@@ -5,11 +5,13 @@ import Image from 'next/image'
 interface UploadButtonProps {
   selectedFile: File | null
   onFileSelect: (file: File) => void
+  text?: string
 }
 
 export default function UploadButton({
   selectedFile,
   onFileSelect,
+  text = '작성할 문서를 업로드해 주세요',
 }: UploadButtonProps) {
   const handleUploadClick = () => {
     const fileInput = document.createElement('input')
@@ -26,9 +28,7 @@ export default function UploadButton({
 
   return (
     <div className="w-full bg-[#1e2738] rounded-3xl p-8 relative -top-10">
-      <p className="text-lg font-semibold text-center mb-5">
-        작성할 문서를 업로드해 주세요
-      </p>
+      <p className="text-lg font-semibold text-center mb-5">{text}</p>
 
       <button
         onClick={handleUploadClick}
