@@ -136,7 +136,7 @@ export function TTSOverlay({
       {isOverlayVisible && (
         <div
           onClick={handleOverlayClick}
-          className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 ${className}`}
+          className={`fixed inset-0 flex items-center justify-center bg-black/70 z-50 ${className}`}
           style={{ touchAction: 'none' }}
         >
           <div className="text-white text-2xl font-bold text-center p-6">

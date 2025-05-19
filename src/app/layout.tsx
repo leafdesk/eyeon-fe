@@ -13,10 +13,10 @@ import KakaoScript from '@/components/KakaoScript'
 //   subsets: ["latin"],
 // });
 
-export const metadata: Metadata = {
-  title: 'Eye On',
-  description: 'Eye On',
-}
+// export const metadata: Metadata = {
+//   title: 'Eye On',
+//   description: 'Eye On',
+// }
 
 export default function RootLayout({
   children,

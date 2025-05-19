@@ -3,9 +3,13 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function MainPage() {
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '메인 페이지입니다. 필요한 서비스를 선택해 주세요.',
+  )
 
   return (
     <div className="min-h-screen bg-[#0e1525] text-white">
@@ -21,6 +25,9 @@ export default function MainPage() {
         }
         right="voice"
       />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Greeting */}
       <div className="text-white mt-7 mb-10 px-5">
