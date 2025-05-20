@@ -186,7 +186,7 @@ const realApi = {
      */
     getDetail: (documentId: number) =>
       apiClient.get<ApiResponse<DocumentData>>(
-        `/document/detail?documentId=${documentId}`,
+        `/document/${documentId}/detail`,
       ),
   },
 }
