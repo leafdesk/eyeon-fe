@@ -6,12 +6,14 @@ interface UploadButtonProps {
   selectedFile: File | null
   onFileSelect: (file: File) => void
   text?: string
+  isLoading?: boolean
 }
 
 export default function UploadButton({
   selectedFile,
   onFileSelect,
   text = '작성할 문서를 업로드해 주세요',
+  isLoading = false,
 }: UploadButtonProps) {
   const handleUploadClick = () => {
     const fileInput = document.createElement('input')
@@ -32,6 +34,7 @@ export default function UploadButton({
 
       <button
         onClick={handleUploadClick}
+        disabled={isLoading}
         className="w-full bg-[#FFD700] text-[#0F1626] py-4 rounded-[12px] flex flex-col gap-2 items-center justify-center"
       >
         <Image
@@ -41,7 +44,11 @@ export default function UploadButton({
           height={24}
         />
         <span className="text-sm font-semibold">
-          {selectedFile ? selectedFile.name : '문서 업로드'}
+          {isLoading
+            ? '업로드 중...'
+            : selectedFile
+            ? selectedFile.name
+            : '문서 업로드'}
         </span>
       </button>
     </div>

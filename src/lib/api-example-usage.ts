@@ -1,5 +1,6 @@
 import api from './api'
 import { handleApiResponse, handleAuthResponse } from './api-helpers'
+import type { FieldAnalyzeData, DocumentWriteRequest } from './api-types'
 
 // 로그인 예시
 export async function handleKakaoLogin(code: string) {
@@ -70,6 +71,31 @@ export async function fetchFormDetail(formId: number) {
   return handleApiResponse(
     api.form.getDetail(formId),
     '양식 상세 조회에 실패했습니다.',
+    null,
+  )
+}
+
+// 필드 분석 예시
+export async function analyzeFormFields(file: File) {
+  return handleApiResponse(
+    api.form.analyzeField(file),
+    '필드 분석에 실패했습니다.',
+    [],
+  )
+}
+
+// 문서 작성 예시
+export async function writeDocument(
+  formId: number,
+  fields: FieldAnalyzeData[],
+) {
+  const requestData: DocumentWriteRequest = {
+    data: fields,
+  }
+
+  return handleApiResponse(
+    api.document.writeDocument(formId, requestData),
+    '문서 작성에 실패했습니다.',
     null,
   )
 }

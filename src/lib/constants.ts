@@ -21,3 +21,10 @@ export const BLIND_STATUS = {
   TRUE: 'TRUE',
   FALSE: 'FALSE',
 } as const
+
+/**
+ * UI 관련 설정
+ */
+export const UI_CONFIG = {
+  SHOW_FIELD_INDEX: false, // 분석된 필드 인덱스 표시 여부
+} as const

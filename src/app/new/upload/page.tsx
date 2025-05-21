@@ -8,32 +8,54 @@ import DocumentPreview from './DocumentPreview'
 import { useRouter } from 'next/navigation'
 import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 import api from '@/lib/api'
+import { FieldAnalyzeData, UploadFormResponseData } from '@/lib/api-types'
 
 export default function NewUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const [formData, setFormData] = useState<UploadFormResponseData | null>(null)
   const router = useRouter()
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     setSelectedFile(file)
+    setUploadLoading(true)
+
+    try {
+      const response = await api.form.uploadForm(file)
+      console.log('업로드 성공:', response.data)
+      setFormData(response.data.data)
+    } catch (error) {
+      console.error('파일 업로드 실패:', error)
+      alert('파일 업로드에 실패했습니다.')
+      setSelectedFile(null)
+    } finally {
+      setUploadLoading(false)
+    }
   }
 
-  const handleFileChange = (file: File) => {
-    setSelectedFile(file)
+  const handleFileChange = async (file: File) => {
+    // 파일이 변경되면 다시 업로드
+    handleFileSelect(file)
   }
 
   const handleNext = async () => {
-    if (!selectedFile) return
+    if (!selectedFile || !formData) return
 
     setLoading(true)
 
     try {
-      const response = await api.form.uploadForm(selectedFile)
-      console.log('업로드 성공:', response.data)
+      const response = await api.form.analyzeField(selectedFile)
+      console.log('필드 분석 성공:', response.data)
+
+      // 분석된 필드 데이터와 formId를 로컬 스토리지에 저장
+      localStorage.setItem('analyzedFields', JSON.stringify(response.data.data))
+      localStorage.setItem('formId', formData.formId.toString())
+
       router.push('/new/write')
     } catch (error) {
-      console.error('파일 업로드 실패:', error)
-      alert('파일 업로드에 실패했습니다.')
+      console.error('필드 분석 실패:', error)
+      alert('문서 필드 분석에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -55,6 +77,7 @@ export default function NewUploadPage() {
           <UploadButton
             selectedFile={selectedFile}
             onFileSelect={handleFileSelect}
+            isLoading={uploadLoading}
           />
         </div>
       )}
@@ -64,7 +87,10 @@ export default function NewUploadPage() {
 
       {/* Bottom Button */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button disabled={!selectedFile || loading} onClick={handleNext}>
+        <Button
+          disabled={!selectedFile || loading || uploadLoading || !formData}
+          onClick={handleNext}
+        >
           다음
         </Button>
       </section>

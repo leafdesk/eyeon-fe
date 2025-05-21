@@ -11,6 +11,9 @@ import type {
   UploadFormResponseData,
   DocumentData,
   DocumentSummaryData,
+  FieldAnalyzeData,
+  DocumentWriteRequest,
+  DocumentWriteResponseData,
 } from './api-types'
 
 /**
@@ -219,6 +222,49 @@ export function getDocumentSummaryMock(documentId: number) {
 export const userModifyResponseMock = createApiResponse(null)
 
 /**
+ * 필드 분석 응답 Mock
+ */
+export const fieldAnalyzeResponseMock = createApiResponse<FieldAnalyzeData[]>([
+  {
+    field: 'B PERSONAL NAME',
+    targetField: 'B PERSONAL NAME FIELD',
+    index: 4,
+    bbox: [363.0, 173.0, 864.0, 200.0],
+    displayName: '이름',
+    value: '홍길동',
+  },
+  {
+    field: 'B PERSONAL PHONE',
+    targetField: 'B PERSONAL PHONE FIELD',
+    index: 6,
+    bbox: [363.0, 200.0, 560.0, 227.0],
+    displayName: '연락처',
+    value: '010-9273-9319',
+  },
+  {
+    field: 'B PERSONAL EMAIL',
+    targetField: 'B PERSONAL EMAIL FIELD',
+    index: 8,
+    bbox: [363.0, 227.0, 700.0, 254.0],
+    displayName: '이메일',
+    value: 'example@example.com',
+  },
+])
+
+/**
+ * 문서 작성 응답 Mock
+ */
+export const documentWriteResponseMock =
+  createApiResponse<DocumentWriteResponseData>({
+    documentName: '작성된_문서.pdf',
+    createdDate: new Date().toISOString(),
+    imageUrl:
+      'https://eyeon-bucket.s3.ap-northeast-2.amazonaws.com/example-image.jpg',
+    pdfUrl:
+      'https://eyeon-bucket.s3.ap-northeast-2.amazonaws.com/example-document.pdf',
+  })
+
+/**
  * Mock 데이터를 AxiosResponse 형식으로 래핑
  */
 function wrapInAxiosResponse<T>(data: T): AxiosResponse<T> {
@@ -262,6 +308,9 @@ export const mockApi = {
 
     uploadForm: (file: File) =>
       Promise.resolve(wrapInAxiosResponse(uploadFormResponseMock)),
+
+    analyzeField: (file: File) =>
+      Promise.resolve(wrapInAxiosResponse(fieldAnalyzeResponseMock)),
   },
 
   document: {
@@ -272,5 +321,8 @@ export const mockApi = {
 
     getDetail: (documentId: number) =>
       Promise.resolve(wrapInAxiosResponse(getDocumentDetailMock(documentId))),
+
+    writeDocument: (formId: number, data: DocumentWriteRequest) =>
+      Promise.resolve(wrapInAxiosResponse(documentWriteResponseMock)),
   },
 }

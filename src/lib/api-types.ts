@@ -97,3 +97,29 @@ export interface DocumentSummaryData {
   summaryText: string
   pdfFileUrl: string
 }
+
+/**
+ * 필드 분석 API 관련 타입
+ */
+export interface FieldAnalyzeData {
+  field: string
+  targetField: string
+  index: number
+  bbox: number[]
+  displayName: string
+  value: string
+}
+
+/**
+ * 문서 작성 API 관련 타입
+ */
+export interface DocumentWriteRequest {
+  data: FieldAnalyzeData[]
+}
+
+export interface DocumentWriteResponseData {
+  documentName: string
+  createdDate: string
+  imageUrl: string
+  pdfUrl: string
+}

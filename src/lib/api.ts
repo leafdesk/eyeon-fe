@@ -12,6 +12,9 @@ import type {
   UploadFormResponseData,
   DocumentData,
   DocumentSummaryData,
+  FieldAnalyzeData,
+  DocumentWriteRequest,
+  DocumentWriteResponseData,
 } from './api-types'
 
 // 토큰 가져오기 함수
@@ -162,6 +165,25 @@ const realApi = {
         },
       )
     },
+
+    /**
+     * 필드 분석 API
+     * @param file 필드를 분석할 원본 문서
+     */
+    analyzeField: (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      return apiClient.post<ApiResponse<FieldAnalyzeData[]>>(
+        '/form/analyze/field',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+    },
   },
 
   // 문서 관련 API
@@ -187,6 +209,17 @@ const realApi = {
     getDetail: (documentId: number) =>
       apiClient.get<ApiResponse<DocumentData>>(
         `/document/${documentId}/detail`,
+      ),
+
+    /**
+     * 문서 작성 API
+     * @param formId 사용할 양식의 기본 키
+     * @param data 필드 정보 배열
+     */
+    writeDocument: (formId: number, data: DocumentWriteRequest) =>
+      apiClient.post<ApiResponse<DocumentWriteResponseData>>(
+        `/document/${formId}/write`,
+        data,
       ),
   },
 }
