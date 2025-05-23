@@ -6,32 +6,26 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import CustomToast from '@/components/CustomToast'
-
-// 문서 응답 데이터 타입 정의
-interface DocumentData {
-  id: number
-  documentName: string
-  createdAt: string
-  imageUrl: string
-  pdfUrl: string
-}
+import { DocumentWriteResponseData } from '@/lib/api-types'
 
 export default function NewCompletePage() {
   const router = useRouter()
   const [showToast, setShowToast] = useState(false)
-  const [documentData, setDocumentData] = useState<DocumentData | null>(null)
+  const [documentData, setDocumentData] =
+    useState<DocumentWriteResponseData | null>(null)
   const [formattedDate, setFormattedDate] = useState<string>('')
 
   useEffect(() => {
     // 로컬 스토리지에서 문서 데이터 가져오기
     const storedData = localStorage.getItem('documentData')
     if (storedData) {
-      const data = JSON.parse(storedData) as DocumentData
+      const responseData = JSON.parse(storedData)
+      const data = responseData.data as DocumentWriteResponseData
       setDocumentData(data)
 
       // 날짜 포맷팅 (YYYY. MM. DD)
-      if (data.createdAt) {
-        const date = new Date(data.createdAt)
+      if (data.createdDate) {
+        const date = new Date(data.createdDate)
         const year = date.getFullYear()
         const month = String(date.getMonth() + 1).padStart(2, '0')
         const day = String(date.getDate()).padStart(2, '0')
@@ -50,18 +44,47 @@ export default function NewCompletePage() {
     router.push('/main')
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (documentData?.pdfUrl) {
-      // PDF 다운로드 링크 생성 및 클릭
-      const link = document.createElement('a')
-      link.href = documentData.pdfUrl
-      link.download = documentData.documentName || '문서.pdf'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      try {
+        // PDF 파일을 fetch로 가져오기
+        const response = await fetch(documentData.pdfUrl)
+        if (!response.ok) {
+          throw new Error('PDF 다운로드에 실패했습니다.')
+        }
 
-      // 다운로드 완료 토스트 표시
-      setShowToast(true)
+        // Blob으로 변환
+        const blob = await response.blob()
+
+        // Blob URL 생성
+        const blobUrl = window.URL.createObjectURL(blob)
+
+        // 다운로드 링크 생성 및 클릭
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.download = documentData.documentName || '문서.pdf'
+        document.body.appendChild(link)
+        link.click()
+
+        // 정리
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+
+        // 다운로드 완료 토스트 표시
+        setShowToast(true)
+      } catch (error) {
+        console.error('PDF 다운로드 오류:', error)
+        // 실패 시 기존 방식으로 시도
+        const link = document.createElement('a')
+        link.href = documentData.pdfUrl
+        link.download = documentData.documentName || '문서.pdf'
+        link.target = '_blank'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        setShowToast(true)
+      }
     }
   }
 
