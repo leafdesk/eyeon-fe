@@ -123,3 +123,37 @@ export interface DocumentWriteResponseData {
   imageUrl: string
   pdfUrl: string
 }
+
+/**
+ * Flask API 응답 타입 정의 (Spring Boot API와 구조가 다름)
+ */
+export interface FlaskApiResponse<T = any> {
+  isSuccess: boolean
+  httpStatus: number
+  message: string
+  data?: T
+  [key: string]: any // 추가 필드들을 위한 인덱스 시그니처
+}
+
+/**
+ * AI 스캔 API 관련 타입
+ */
+export interface AiScanRequest {
+  file: File
+}
+
+export interface AiScanResponseData {
+  filename: string
+  base64: string
+}
+
+/**
+ * AI 스캔 API 응답 타입 (Flask API 구조)
+ */
+export interface AiScanResponse {
+  isSuccess: boolean
+  httpStatus: number
+  message: string
+  filename: string
+  base64: string
+}

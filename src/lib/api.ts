@@ -15,6 +15,7 @@ import type {
   FieldAnalyzeData,
   DocumentWriteRequest,
   DocumentWriteResponseData,
+  AiScanResponse,
 } from './api-types'
 
 // 토큰 가져오기 함수
@@ -33,7 +34,15 @@ const apiClient = axios.create({
   },
 })
 
-// 요청 인터셉터 - 토큰 추가
+// Flask API용 Axios 인스턴스 생성
+const flaskClient = axios.create({
+  baseURL: 'http://3.39.215.178:5050/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// 요청 인터셉터 - 토큰 추가 (apiClient)
 apiClient.interceptors.request.use(
   (config) => {
     const token = getToken()
@@ -45,7 +54,19 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
-// 응답 인터셉터 - 에러 처리
+// 요청 인터셉터 - 토큰 추가 (flaskClient)
+flaskClient.interceptors.request.use(
+  (config) => {
+    const token = getToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error),
+)
+
+// 응답 인터셉터 - 에러 처리 (apiClient)
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiResponse>) => {
@@ -54,6 +75,30 @@ apiClient.interceptors.response.use(
 
     // 에러 로깅
     console.error('API Error:', errorResponse?.message || error.message)
+
+    // 401 에러 처리 (인증 오류)
+    if (error.response?.status === 401) {
+      // 클라이언트 사이드에서만 실행
+      if (typeof window !== 'undefined') {
+        // 토큰 제거 및 로그인 페이지로 리다이렉트 등의
+        // 인증 관련 처리를 수행할 수 있음
+        localStorage.removeItem('token')
+      }
+    }
+
+    return Promise.reject(error)
+  },
+)
+
+// 응답 인터셉터 - 에러 처리 (flaskClient)
+flaskClient.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiResponse>) => {
+    // API 에러 응답 추출
+    const errorResponse = error.response?.data
+
+    // 에러 로깅
+    console.error('Flask API Error:', errorResponse?.message || error.message)
 
     // 401 에러 처리 (인증 오류)
     if (error.response?.status === 401) {
@@ -222,9 +267,29 @@ const realApi = {
         data,
       ),
   },
+
+  // AI 관련 API
+  ai: {
+    /**
+     * 이미지 스캔 API
+     * @param file 스캔할 이미지 파일
+     */
+    scan: (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      return flaskClient.post<AiScanResponse>('/ai/scan', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+    },
+  },
 }
 
 // 실제 API 또는 Mock API를 반환
 export const api = USE_API_MOCK ? mockApi : realApi
+
+export { flaskClient }
 
 export default api
