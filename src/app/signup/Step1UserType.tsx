@@ -81,7 +81,7 @@ export default function Step1UserType({ state, setState, onNext }: Props) {
               height={60}
             />
             <span className="font-semibold text-base">
-              {type === 'regular' ? '일반인' : '시각 장애인'}
+              {type === 'regular' ? '비장애인' : '시각 장애인'}
             </span>
           </button>
         ))}
