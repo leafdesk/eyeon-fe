@@ -164,3 +164,30 @@ export interface AiScanResponse {
   filename: string
   base64: string
 }
+
+/**
+ * 문서 조언 API 관련 타입
+ */
+export interface DocumentAdviceData {
+  i: number // 필드 인덱스
+  d: string // 필드 설명
+  v: string // 현재 값
+  a: string // 조언 내용
+}
+
+/**
+ * 문서 수정 API 관련 타입
+ */
+export interface DocumentModifyRequest {
+  data: Array<{
+    i: number // 필드 인덱스
+    v: string // 새로운 값
+  }>
+}
+
+export interface DocumentModifyResponseData {
+  documentName: string
+  createdDate: string
+  imageUrl: string
+  pdfUrl: string
+}

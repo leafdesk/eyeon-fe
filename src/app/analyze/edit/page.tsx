@@ -4,36 +4,35 @@ import Header from '@/components/Header'
 import AnalysisCard from '../AnalysisCard'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-
-// 임시 데이터 (실제로는 API에서 받아올 예정)
-const analysisData = [
-  {
-    originalContent:
-      '이것은 첫 번째 인덱스입니다. 땅은 밭을 세워 우는 별들은 부끄러운 이름을 슬퍼하는 까닭입니다. 별 하나에 추억과 별 하나에 사랑과 별 하나에 쓸쓸함과 별 하나에 동경과 별 하나에 시와 별 하나에 어머니, 어머니, 어머님,',
-    feedback:
-      '문장이 너무 길고 복잡합니다. 쉼표로 구분된 여러 문장으로 나누는 것이 좋겠습니다.',
-  },
-  {
-    originalContent:
-      '두 번째 인덱스입니다. 별 하나에 추억과 별 하나에 사랑과 별 하나에 쓸쓸함과 별 하나에 동경과 별 하나에 시와 별 하나에 어머니, 어머니, 어머님, 땅은 밭을 세워 우는 별들은 부끄러운 이름을 슬퍼하는 까닭입니다. ',
-    feedback:
-      '반복되는 표현이 많습니다. "별 하나에"라는 표현을 다양하게 바꾸어 보세요.',
-  },
-  {
-    originalContent:
-      '세 번째 인덱스입니다. 세 번째 인덱스입니다. 세 번째 인덱스입니다. 세 번째 인덱스입니다. ',
-    feedback:
-      '문장의 주어와 서술어가 명확하지 않습니다. 주어를 명확히 하고 서술어를 적절히 배치해보세요.',
-  },
-]
+import { useState, useEffect } from 'react'
+import type { DocumentAdviceData } from '@/lib/api-types'
 
 export default function AnalyzeEditPage() {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [editedContents, setEditedContents] = useState(
-    analysisData.map((item) => item.originalContent),
-  )
+  const [adviceData, setAdviceData] = useState<DocumentAdviceData[]>([])
+  const [editedContents, setEditedContents] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // sessionStorage에서 조언 데이터 가져오기
+    const storedAdviceData = sessionStorage.getItem('adviceData')
+    if (storedAdviceData) {
+      try {
+        const parsedData: DocumentAdviceData[] = JSON.parse(storedAdviceData)
+        setAdviceData(parsedData)
+        // 초기 편집 내용을 현재 값으로 설정
+        setEditedContents(parsedData.map((item) => item.v))
+        setLoading(false)
+      } catch (error) {
+        console.error('조언 데이터 파싱 실패:', error)
+        router.push('/analyze/upload')
+      }
+    } else {
+      // 조언 데이터가 없으면 업로드 페이지로 리다이렉트
+      router.push('/analyze/upload')
+    }
+  }, [router])
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -42,10 +41,16 @@ export default function AnalyzeEditPage() {
   }
 
   const handleNext = () => {
-    if (currentIndex < analysisData.length - 1) {
+    if (currentIndex < adviceData.length - 1) {
       setCurrentIndex((prev) => prev + 1)
     } else {
       // 마지막 인덱스에서는 완료 페이지로 이동
+      // 수정된 데이터를 sessionStorage에 저장
+      const modifiedData = adviceData.map((item, index) => ({
+        i: item.i,
+        v: editedContents[index],
+      }))
+      sessionStorage.setItem('modifiedData', JSON.stringify(modifiedData))
       router.push('/analyze/complete')
     }
   }
@@ -57,6 +62,35 @@ export default function AnalyzeEditPage() {
       return newContents
     })
   }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#0e1525] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>데이터를 불러오는 중...</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (adviceData.length === 0) {
+    return (
+      <main className="min-h-screen bg-[#0e1525] text-white flex items-center justify-center">
+        <div className="text-center">
+          <p>분석할 데이터가 없습니다.</p>
+          <Button
+            onClick={() => router.push('/analyze/upload')}
+            className="mt-4"
+          >
+            다시 업로드하기
+          </Button>
+        </div>
+      </main>
+    )
+  }
+
+  const currentData = adviceData[currentIndex]
 
   return (
     <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
@@ -72,7 +106,7 @@ export default function AnalyzeEditPage() {
         </h1>
         <div className="bg-[#1E2436] px-3 py-[5px] rounded-full w-[44px] text-center text-[13px] font-normal text-[#9B9B9B]">
           <span className="text-white font-semibold">{currentIndex + 1}</span>/
-          {analysisData.length}
+          {adviceData.length}
         </div>
       </section>
 
@@ -83,16 +117,14 @@ export default function AnalyzeEditPage() {
         {/* Original Content */}
         <textarea
           className="w-full bg-[#1E2436] rounded-xl px-4 py-[14px] mb-4 text-[#9B9B9B] font-normal text-sm resize-none focus:outline-none focus:ring-2 focus:ring-white focus:text-white"
-          value={editedContents[currentIndex]}
+          value={editedContents[currentIndex] || ''}
           onChange={(e) => handleContentChange(e.target.value)}
           rows={4}
+          placeholder="내용을 입력하세요..."
         />
 
         {/* AI Feedback */}
-        <AnalysisCard
-          title="문서 추출 내용"
-          feedback={analysisData[currentIndex].feedback}
-        />
+        <AnalysisCard title="AI 조언" feedback={currentData.a} />
       </section>
 
       {/* Spacer */}
@@ -108,7 +140,7 @@ export default function AnalyzeEditPage() {
           이전
         </Button>
         <Button className="flex-[1.5]" onClick={handleNext}>
-          다음
+          {currentIndex === adviceData.length - 1 ? '완료' : '다음'}
         </Button>
       </section>
     </main>

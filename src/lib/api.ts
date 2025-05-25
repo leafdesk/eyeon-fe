@@ -17,6 +17,9 @@ import type {
   DocumentWriteRequest,
   DocumentWriteResponseData,
   AiScanResponse,
+  DocumentAdviceData,
+  DocumentModifyRequest,
+  DocumentModifyResponseData,
 } from './api-types'
 
 // 토큰 가져오기 함수
@@ -286,6 +289,26 @@ const realApi = {
         },
       )
     },
+
+    /**
+     * 문서 조언 API
+     * @param documentId 조언을 받을 문서 ID
+     */
+    getAdvice: (documentId: number) =>
+      apiClient.get<ApiResponse<DocumentAdviceData[]>>(
+        `/document/${documentId}/advice`,
+      ),
+
+    /**
+     * 문서 수정 API
+     * @param documentId 수정할 문서 ID
+     * @param data 수정할 필드 정보 배열
+     */
+    modifyDocument: (documentId: number, data: DocumentModifyRequest) =>
+      apiClient.put<ApiResponse<DocumentModifyResponseData>>(
+        `/document/${documentId}`,
+        data,
+      ),
   },
 
   // AI 관련 API

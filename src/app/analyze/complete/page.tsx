@@ -4,15 +4,91 @@ import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CustomToast from '@/components/CustomToast'
+import api from '@/lib/api'
+import type { DocumentModifyRequest } from '@/lib/api-types'
 
 export default function AnalyzeCompletePage() {
   const router = useRouter()
   const [showToast, setShowToast] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [documentInfo, setDocumentInfo] = useState<{
+    name: string
+    date: string
+    pdfUrl?: string
+  }>({
+    name: '문서 제목',
+    date: new Date().toLocaleDateString('ko-KR'),
+  })
+
+  useEffect(() => {
+    // 페이지 로드 시 수정된 데이터를 API로 전송
+    const submitModifiedData = async () => {
+      const modifiedDataStr = sessionStorage.getItem('modifiedData')
+      const documentIdStr = sessionStorage.getItem('documentId')
+
+      if (modifiedDataStr && documentIdStr) {
+        setLoading(true)
+        try {
+          const modifiedData: DocumentModifyRequest['data'] =
+            JSON.parse(modifiedDataStr)
+          const documentId = parseInt(documentIdStr)
+
+          const response = await api.document.modifyDocument(documentId, {
+            data: modifiedData,
+          })
+          console.log('문서 수정 성공:', response.data)
+
+          // 응답에서 문서 정보 업데이트
+          if (response.data.data) {
+            setDocumentInfo({
+              name: response.data.data.documentName,
+              date: new Date(response.data.data.createdDate).toLocaleDateString(
+                'ko-KR',
+              ),
+              pdfUrl: response.data.data.pdfUrl,
+            })
+          }
+
+          // sessionStorage 정리
+          sessionStorage.removeItem('modifiedData')
+          sessionStorage.removeItem('documentId')
+          sessionStorage.removeItem('adviceData')
+        } catch (error) {
+          console.error('문서 수정 실패:', error)
+          alert('문서 수정에 실패했습니다.')
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    submitModifiedData()
+  }, [])
 
   const handleDownload = () => {
+    if (documentInfo.pdfUrl) {
+      // 실제 다운로드 로직
+      const link = document.createElement('a')
+      link.href = documentInfo.pdfUrl
+      link.download = documentInfo.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
     setShowToast(true)
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#0e1525] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>문서를 처리하는 중...</p>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -30,8 +106,8 @@ export default function AnalyzeCompletePage() {
       {/* Title */}
       <div className="text-center mt-3 mb-5 space-y-1">
         <h1 className="text-[24px] font-semibold">문서 수정 완료</h1>
-        <p className="text-[#9B9B9B] text-sm">문서 제목</p>
-        <p className="text-[#9B9B9B] text-sm">0000. 00. 00</p>
+        <p className="text-[#9B9B9B] text-sm">{documentInfo.name}</p>
+        <p className="text-[#9B9B9B] text-sm">{documentInfo.date}</p>
       </div>
 
       {/* AI Summary Button */}
@@ -65,6 +141,7 @@ export default function AnalyzeCompletePage() {
         <Button
           className="bg-[#FFD700] h-[48px] text-sm"
           onClick={handleDownload}
+          disabled={!documentInfo.pdfUrl}
         >
           문서 다운로드
         </Button>

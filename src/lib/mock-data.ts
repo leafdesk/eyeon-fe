@@ -15,6 +15,9 @@ import type {
   DocumentWriteRequest,
   DocumentWriteResponseData,
   UploadDocumentResponseData,
+  DocumentAdviceData,
+  DocumentModifyRequest,
+  DocumentModifyResponseData,
 } from './api-types'
 
 /**
@@ -277,6 +280,45 @@ export const documentWriteResponseMock =
   })
 
 /**
+ * 문서 조언 응답 Mock
+ */
+export const documentAdviceResponseMock = createApiResponse<
+  DocumentAdviceData[]
+>([
+  {
+    i: 0,
+    d: '이름',
+    v: '홍길동',
+    a: '이름이 정확히 입력되었습니다. 공식 문서와 일치하는지 확인해주세요.',
+  },
+  {
+    i: 1,
+    d: '연락처',
+    v: '010-1234-5678',
+    a: '연락처 형식이 올바릅니다. 현재 사용 중인 번호인지 확인해주세요.',
+  },
+  {
+    i: 2,
+    d: '주소',
+    v: '서울특별시 강남구 테헤란로 123',
+    a: '주소가 상세하게 입력되었습니다. 우편번호도 함께 기재하면 더 좋겠습니다.',
+  },
+])
+
+/**
+ * 문서 수정 응답 Mock
+ */
+export const documentModifyResponseMock =
+  createApiResponse<DocumentModifyResponseData>({
+    documentName: '수정된_문서.pdf',
+    createdDate: new Date().toISOString(),
+    imageUrl:
+      'https://eyeon-bucket.s3.ap-northeast-2.amazonaws.com/modified-image.jpg',
+    pdfUrl:
+      'https://eyeon-bucket.s3.ap-northeast-2.amazonaws.com/modified-document.pdf',
+  })
+
+/**
  * Mock 데이터를 AxiosResponse 형식으로 래핑
  */
 function wrapInAxiosResponse<T>(data: T): AxiosResponse<T> {
@@ -339,5 +381,11 @@ export const mockApi = {
 
     uploadDocument: (file: File) =>
       Promise.resolve(wrapInAxiosResponse(uploadDocumentResponseMock)),
+
+    getAdvice: (documentId: number) =>
+      Promise.resolve(wrapInAxiosResponse(documentAdviceResponseMock)),
+
+    modifyDocument: (documentId: number, data: DocumentModifyRequest) =>
+      Promise.resolve(wrapInAxiosResponse(documentModifyResponseMock)),
   },
 }

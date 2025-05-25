@@ -11,29 +11,62 @@ import api from '@/lib/api'
 
 export default function AnalyzeUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [documentId, setDocumentId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     setSelectedFile(file)
+    setLoading(true)
+
+    try {
+      const response = await api.document.uploadDocument(file)
+      console.log('업로드 성공:', response.data)
+      setDocumentId(response.data.data.documentId)
+    } catch (error) {
+      console.error('파일 업로드 실패:', error)
+      alert('파일 업로드에 실패했습니다.')
+      setSelectedFile(null)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleFileChange = (file: File) => {
+  const handleFileChange = async (file: File) => {
     setSelectedFile(file)
+    setLoading(true)
+
+    try {
+      const response = await api.document.uploadDocument(file)
+      console.log('업로드 성공:', response.data)
+      setDocumentId(response.data.data.documentId)
+    } catch (error) {
+      console.error('파일 업로드 실패:', error)
+      alert('파일 업로드에 실패했습니다.')
+      setSelectedFile(null)
+      setDocumentId(null)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleNext = async () => {
-    if (!selectedFile) return
+    if (!documentId) return
 
     setLoading(true)
 
     try {
-      const response = await api.document.uploadDocument(selectedFile)
-      console.log('업로드 성공:', response.data)
-      router.push('/analyze/result')
+      const response = await api.document.getAdvice(documentId)
+      console.log('조언 조회 성공:', response.data)
+
+      // 조언 데이터와 documentId를 sessionStorage에 저장하여 edit 페이지에서 사용
+      sessionStorage.setItem('adviceData', JSON.stringify(response.data.data))
+      sessionStorage.setItem('documentId', documentId.toString())
+
+      router.push('/analyze/edit')
     } catch (error) {
-      console.error('파일 업로드 실패:', error)
-      alert('파일 업로드에 실패했습니다.')
+      console.error('조언 조회 실패:', error)
+      alert('문서 분석에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -70,7 +103,7 @@ export default function AnalyzeUploadPage() {
 
       {/* Bottom Button */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
-        <Button disabled={!selectedFile || loading} onClick={handleNext}>
+        <Button disabled={!documentId || loading} onClick={handleNext}>
           다음
         </Button>
       </section>
