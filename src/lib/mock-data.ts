@@ -129,6 +129,7 @@ const documentMockData: DocumentData[] = [
     documentType: FORM_TYPES.SELF_INTRO,
     documentSize: 215000,
     documentUrl: 'https://example.com/documents/1',
+    documentImgUrl: 'https://example.com/images/1.jpg',
   },
   {
     documentId: 2,
@@ -137,6 +138,7 @@ const documentMockData: DocumentData[] = [
     documentType: FORM_TYPES.CONSENT,
     documentSize: 320000,
     documentUrl: 'https://example.com/documents/2',
+    documentImgUrl: 'https://example.com/images/2.jpg',
   },
   {
     documentId: 3,
@@ -145,6 +147,7 @@ const documentMockData: DocumentData[] = [
     documentType: FORM_TYPES.RESUME,
     documentSize: 180000,
     documentUrl: 'https://example.com/documents/3',
+    documentImgUrl: 'https://example.com/images/3.jpg',
   },
 ]
 
@@ -387,5 +390,22 @@ export const mockApi = {
 
     modifyDocument: (documentId: number, data: DocumentModifyRequest) =>
       Promise.resolve(wrapInAxiosResponse(documentModifyResponseMock)),
+  },
+
+  ai: {
+    scan: (file: File) =>
+      Promise.resolve({
+        data: {
+          isSuccess: true,
+          httpStatus: 200,
+          message: '스캔이 완료되었습니다.',
+          filename: file.name,
+          base64: 'mock-base64-data',
+        },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any,
+      }),
   },
 }

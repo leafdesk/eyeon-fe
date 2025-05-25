@@ -125,16 +125,23 @@ export default function DocumentCapture({
             // 현재 경로에 따라 적절한 페이지로 이동
             const scanData = response.data
 
+            // 스캔 데이터를 sessionStorage에 저장
+            sessionStorage.setItem('scanData', JSON.stringify(scanData))
+            sessionStorage.setItem(
+              'originalFile',
+              JSON.stringify({
+                name: file.name,
+                size: file.size,
+                type: file.type,
+              }),
+            )
+
             if (pathname.includes('/new')) {
               // /new에서 온 경우 -> /new/upload로 이동
-              router.push('/new/upload', {
-                state: { scanData, originalFile: file },
-              })
+              router.push('/new/upload')
             } else if (pathname.includes('/analyze')) {
               // /analyze에서 온 경우 -> /analyze/upload로 이동
-              router.push('/analyze/upload', {
-                state: { scanData, originalFile: file },
-              })
+              router.push('/analyze/upload')
             }
           } catch (error) {
             console.error('AI 스캔 실패:', error)
