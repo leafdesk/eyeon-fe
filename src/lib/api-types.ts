@@ -84,6 +84,13 @@ export interface UploadFormResponseData {
   formUrl: string
 }
 
+export interface UploadDocumentResponseData {
+  documentId: number
+  name: string
+  documentSize: number
+  documentUrl: string
+}
+
 export interface DocumentData {
   documentId: number
   name: string

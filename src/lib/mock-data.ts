@@ -14,6 +14,7 @@ import type {
   FieldAnalyzeData,
   DocumentWriteRequest,
   DocumentWriteResponseData,
+  UploadDocumentResponseData,
 } from './api-types'
 
 /**
@@ -181,6 +182,17 @@ export const uploadFormResponseMock = createApiResponse<UploadFormResponseData>(
 )
 
 /**
+ * 문서 업로드 응답 Mock
+ */
+export const uploadDocumentResponseMock =
+  createApiResponse<UploadDocumentResponseData>({
+    documentId: 8,
+    name: '업로드된_문서.pdf',
+    documentSize: 250000,
+    documentUrl: 'https://example.com/documents/8',
+  })
+
+/**
  * 문서 목록 조회 Mock 함수
  */
 export function getDocumentListMock() {
@@ -324,5 +336,8 @@ export const mockApi = {
 
     writeDocument: (formId: number, data: DocumentWriteRequest) =>
       Promise.resolve(wrapInAxiosResponse(documentWriteResponseMock)),
+
+    uploadDocument: (file: File) =>
+      Promise.resolve(wrapInAxiosResponse(uploadDocumentResponseMock)),
   },
 }

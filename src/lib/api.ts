@@ -10,6 +10,7 @@ import type {
   UserInfoData,
   FormData as ApiFormData,
   UploadFormResponseData,
+  UploadDocumentResponseData,
   DocumentData,
   DocumentSummaryData,
   FieldAnalyzeData,
@@ -266,6 +267,25 @@ const realApi = {
         `/document/${formId}/write`,
         data,
       ),
+
+    /**
+     * 문서 업로드
+     * @param file 업로드할 문서 파일
+     */
+    uploadDocument: (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      return apiClient.post<ApiResponse<UploadDocumentResponseData>>(
+        '/document',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+    },
   },
 
   // AI 관련 API

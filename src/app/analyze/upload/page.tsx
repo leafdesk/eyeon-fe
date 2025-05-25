@@ -28,7 +28,7 @@ export default function AnalyzeUploadPage() {
     setLoading(true)
 
     try {
-      const response = await api.form.uploadForm(selectedFile)
+      const response = await api.document.uploadDocument(selectedFile)
       console.log('업로드 성공:', response.data)
       router.push('/analyze/result')
     } catch (error) {
