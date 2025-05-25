@@ -51,7 +51,14 @@ export default function AnalyzeEditPage() {
         v: editedContents[index],
       }))
       sessionStorage.setItem('modifiedData', JSON.stringify(modifiedData))
-      router.push('/analyze/complete')
+
+      // documentId를 URL 파라미터로 전달
+      const documentId = sessionStorage.getItem('documentId')
+      if (documentId) {
+        router.push(`/analyze/complete?documentId=${documentId}`)
+      } else {
+        router.push('/analyze/complete')
+      }
     }
   }
 

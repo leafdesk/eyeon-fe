@@ -3,30 +3,48 @@
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
 import CustomToast from '@/components/CustomToast'
 import api from '@/lib/api'
 import type { DocumentModifyRequest } from '@/lib/api-types'
 
-export default function AnalyzeCompletePage() {
+function AnalyzeCompleteContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [showToast, setShowToast] = useState(false)
   const [loading, setLoading] = useState(false)
   const [documentInfo, setDocumentInfo] = useState<{
     name: string
     date: string
     pdfUrl?: string
+    imgUrl?: string
   }>({
     name: '문서 제목',
     date: new Date().toLocaleDateString('ko-KR'),
   })
 
+  console.log('documentInfo', documentInfo)
+
   useEffect(() => {
+    const documentIdFromUrl = searchParams.get('documentId')
+
+    // localStorage에서 저장된 문서 정보 확인
+    const savedDocumentInfo = localStorage.getItem('documentInfo')
+    if (savedDocumentInfo) {
+      try {
+        const parsedInfo = JSON.parse(savedDocumentInfo)
+        setDocumentInfo(parsedInfo)
+      } catch (error) {
+        console.error('저장된 문서 정보 파싱 실패:', error)
+      }
+    }
+
     // 페이지 로드 시 수정된 데이터를 API로 전송
     const submitModifiedData = async () => {
       const modifiedDataStr = sessionStorage.getItem('modifiedData')
-      const documentIdStr = sessionStorage.getItem('documentId')
+      const documentIdStr =
+        sessionStorage.getItem('documentId') || documentIdFromUrl
 
       if (modifiedDataStr && documentIdStr) {
         setLoading(true)
@@ -42,13 +60,21 @@ export default function AnalyzeCompletePage() {
 
           // 응답에서 문서 정보 업데이트
           if (response.data.data) {
-            setDocumentInfo({
+            const newDocumentInfo = {
               name: response.data.data.documentName,
               date: new Date(response.data.data.createdDate).toLocaleDateString(
                 'ko-KR',
               ),
               pdfUrl: response.data.data.pdfUrl,
-            })
+              imgUrl: response.data.data.imageUrl,
+            }
+            setDocumentInfo(newDocumentInfo)
+
+            // localStorage에 문서 정보 저장 (새로고침 시 유지를 위해)
+            localStorage.setItem(
+              'documentInfo',
+              JSON.stringify(newDocumentInfo),
+            )
           }
 
           // sessionStorage 정리
@@ -65,7 +91,7 @@ export default function AnalyzeCompletePage() {
     }
 
     submitModifiedData()
-  }, [])
+  }, [searchParams])
 
   const handleDownload = () => {
     if (documentInfo.pdfUrl) {
@@ -78,6 +104,12 @@ export default function AnalyzeCompletePage() {
       document.body.removeChild(link)
     }
     setShowToast(true)
+  }
+
+  const handleGoHome = () => {
+    // localStorage 정리
+    localStorage.removeItem('documentInfo')
+    router.push('/main')
   }
 
   if (loading) {
@@ -129,7 +161,19 @@ export default function AnalyzeCompletePage() {
       {/* Document Preview */}
       <section className="px-15 mb-8">
         <div className="bg-white rounded-sm flex items-center justify-center overflow-hidden">
-          <div className="w-full aspect-[7/10] bg-white" />
+          {documentInfo.imgUrl ? (
+            <Image
+              src={documentInfo.imgUrl}
+              alt="문서 미리보기"
+              width={300}
+              height={400}
+              className="w-full aspect-[7/10] object-contain"
+            />
+          ) : (
+            <div className="w-full aspect-[7/10] bg-gray-100 flex items-center justify-center">
+              <p className="text-gray-500 text-sm">문서 이미지 로딩 중...</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -145,13 +189,27 @@ export default function AnalyzeCompletePage() {
         >
           문서 다운로드
         </Button>
-        <Button
-          className="h-[48px] text-sm"
-          onClick={() => router.push('/main')}
-        >
+        <Button className="h-[48px] text-sm" onClick={handleGoHome}>
           홈으로
         </Button>
       </section>
     </main>
+  )
+}
+
+export default function AnalyzeCompletePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#0e1525] text-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+            <p>페이지를 불러오는 중...</p>
+          </div>
+        </main>
+      }
+    >
+      <AnalyzeCompleteContent />
+    </Suspense>
   )
 }

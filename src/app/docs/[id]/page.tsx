@@ -42,6 +42,8 @@ export default function DocPage() {
     setShowToast(true)
   }
 
+  console.log('document', document)
+
   return (
     <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
       <CustomToast
@@ -95,9 +97,9 @@ export default function DocPage() {
           </div>
         ) : (
           <div className="bg-white rounded-sm flex items-center justify-center overflow-hidden">
-            {document?.documentUrl ? (
+            {document?.documentImgUrl ? (
               <Image
-                src={document.documentUrl}
+                src={document.documentImgUrl}
                 alt={document.name || '문서 미리보기'}
                 width={500}
                 height={700}

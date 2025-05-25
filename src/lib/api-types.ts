@@ -98,6 +98,7 @@ export interface DocumentData {
   documentType: 'LEASE' | 'SELF_INTRO' | 'RESUME' | string
   documentSize: number
   documentUrl: string
+  documentImgUrl: string
 }
 
 export interface DocumentSummaryData {
