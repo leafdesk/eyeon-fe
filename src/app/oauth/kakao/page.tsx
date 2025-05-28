@@ -7,6 +7,20 @@ import type { AxiosError } from 'axios'
 import type { ApiResponse } from '@/lib/api-types'
 import type { LoginResponseData } from '@/lib/api-types'
 
+// 로딩 스피너 컴포넌트
+export function LoadingSpinner() {
+  return (
+    <div className="fixed inset-0 bg-[#0e1525] flex flex-col items-center justify-center">
+      <img
+        src="/icons/eyeon_logo_main.svg"
+        alt="EyeOn Logo"
+        className="w-24 h-24 mb-4"
+      />
+      <p className="text-white text-lg">Loading...</p>
+    </div>
+  )
+}
+
 // 실제 로그인 처리 컴포넌트
 function KakaoCallbackContent() {
   const router = useRouter()
@@ -63,15 +77,25 @@ function KakaoCallbackContent() {
   }, [code, router])
 
   if (error) {
-    return <p style={{ color: 'red' }}>에러: {error}</p>
+    return (
+      <div className="fixed inset-0 bg-[#0e1525] flex flex-col items-center justify-center">
+        <img
+          src="/icons/eyeon_logo_main.svg"
+          alt="EyeOn Logo"
+          className="w-24 h-24 mb-4"
+        />
+        <p className="text-[#FFD700] text-lg">에러: {error}</p>
+      </div>
+    )
   }
-  return <p>로그인 처리 중…</p>
+
+  return <LoadingSpinner />
 }
 
 // 메인 페이지 컴포넌트 - Suspense로 감싸서 export
 export default function KakaoOAuthCallback() {
   return (
-    <Suspense fallback={<p>로딩 중...</p>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <KakaoCallbackContent />
     </Suspense>
   )
