@@ -8,7 +8,7 @@ import type { ApiResponse } from '@/lib/api-types'
 import type { LoginResponseData } from '@/lib/api-types'
 
 // 로딩 스피너 컴포넌트
-export function LoadingSpinner() {
+function LoadingSpinner() {
   return (
     <div className="fixed inset-0 bg-[#0e1525] flex flex-col items-center justify-center">
       <img
