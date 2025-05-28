@@ -6,20 +6,7 @@ import api from '@/lib/api' // realApi 또는 mockApi 둘 다 export된 모듈
 import type { AxiosError } from 'axios'
 import type { ApiResponse } from '@/lib/api-types'
 import type { LoginResponseData } from '@/lib/api-types'
-
-// 로딩 스피너 컴포넌트
-function LoadingSpinner() {
-  return (
-    <div className="fixed inset-0 bg-[#0e1525] flex flex-col items-center justify-center">
-      <img
-        src="/icons/eyeon_logo_main.svg"
-        alt="EyeOn Logo"
-        className="w-24 h-24 mb-4"
-      />
-      <p className="text-white text-lg">Loading...</p>
-    </div>
-  )
-}
+import Loading from './Loading'
 
 // 실제 로그인 처리 컴포넌트
 function KakaoCallbackContent() {
@@ -89,13 +76,13 @@ function KakaoCallbackContent() {
     )
   }
 
-  return <LoadingSpinner />
+  return <Loading />
 }
 
 // 메인 페이지 컴포넌트 - Suspense로 감싸서 export
 export default function KakaoOAuthCallback() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<Loading />}>
       <KakaoCallbackContent />
     </Suspense>
   )
