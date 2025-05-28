@@ -36,6 +36,7 @@ function AISummaryContent() {
         const documentName = searchParams.get('documentName')
         const createdDate = searchParams.get('createdDate')
         const pdfUrl = searchParams.get('pdfUrl')
+        const formIdStr = searchParams.get('formId')
 
         if (documentName && createdDate) {
           // 문서 정보 설정
@@ -48,15 +49,28 @@ function AISummaryContent() {
             pdfUrl: pdfUrl || '',
           })
 
-          // TODO: 실제로는 documentId가 필요하지만, 현재 new 플로우에서는 documentId를 받지 못함
-          // 임시로 문서 목록을 조회하여 이름으로 매칭하거나, 다른 방법을 사용해야 함
-          // 지금은 mock 데이터나 기본 요약을 표시
-
-          // 임시 요약 데이터 (실제로는 API에서 가져와야 함)
-          setSummary({
-            summaryText: `${documentName}에 대한 AI 요약이 준비 중입니다.\n\n작성된 문서의 주요 내용과 핵심 포인트를 분석하여 요약본을 제공할 예정입니다.`,
-            pdfFileUrl: pdfUrl || '',
-          })
+          // formId가 있으면 실제 API 호출 시도
+          if (formIdStr) {
+            try {
+              const formId = parseInt(formIdStr)
+              // formId를 documentId로 사용하여 문서 요약 조회
+              const response = await api.document.getSummary(formId)
+              setSummary(response.data.data)
+            } catch (apiError) {
+              console.error('API 호출 실패:', apiError)
+              // API 호출 실패 시 기본 요약 표시
+              setSummary({
+                summaryText: `${documentName}에 대한 AI 요약이 준비 중입니다.\n\n작성된 문서의 주요 내용과 핵심 포인트를 분석하여 요약본을 제공할 예정입니다.`,
+                pdfFileUrl: pdfUrl || '',
+              })
+            }
+          } else {
+            // formId가 없으면 기본 요약 표시
+            setSummary({
+              summaryText: `${documentName}에 대한 AI 요약이 준비 중입니다.\n\n작성된 문서의 주요 내용과 핵심 포인트를 분석하여 요약본을 제공할 예정입니다.`,
+              pdfFileUrl: pdfUrl || '',
+            })
+          }
         } else {
           setError('문서 정보를 찾을 수 없습니다.')
         }

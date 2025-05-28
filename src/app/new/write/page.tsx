@@ -93,12 +93,16 @@ export default function NewWritePage() {
       const response = await api.document.writeDocument(formId, documentData)
       console.log('문서 작성 성공:', response.data)
 
-      // 응답 데이터를 로컬 스토리지에 저장
-      localStorage.setItem('documentData', JSON.stringify(response.data))
+      // 응답 데이터를 로컬 스토리지에 저장 (formId도 함께 저장)
+      const dataToStore = {
+        ...response.data,
+        formId: formId, // formId 추가
+      }
+      localStorage.setItem('documentData', JSON.stringify(dataToStore))
 
       // 기존 필드 데이터 정리
       localStorage.removeItem('analyzedFields')
-      localStorage.removeItem('formId')
+      // formId는 complete 페이지에서 사용할 수 있도록 유지
 
       // 완료 페이지로 이동
       router.push('/new/complete')

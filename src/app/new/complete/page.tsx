@@ -14,6 +14,7 @@ export default function NewCompletePage() {
   const [documentData, setDocumentData] =
     useState<DocumentWriteResponseData | null>(null)
   const [formattedDate, setFormattedDate] = useState<string>('')
+  const [formId, setFormId] = useState<number | null>(null)
 
   useEffect(() => {
     // 로컬 스토리지에서 문서 데이터 가져오기
@@ -22,6 +23,11 @@ export default function NewCompletePage() {
       const responseData = JSON.parse(storedData)
       const data = responseData.data as DocumentWriteResponseData
       setDocumentData(data)
+
+      // formId 설정 (write 페이지에서 추가로 저장한 경우)
+      if (responseData.formId) {
+        setFormId(responseData.formId)
+      }
 
       // 날짜 포맷팅 (YYYY. MM. DD)
       if (data.createdDate) {
@@ -41,6 +47,7 @@ export default function NewCompletePage() {
   const handleHomeClick = () => {
     // 문서 데이터 삭제
     localStorage.removeItem('documentData')
+    localStorage.removeItem('formId') // formId도 정리
     router.push('/main')
   }
 
@@ -52,6 +59,12 @@ export default function NewCompletePage() {
         createdDate: documentData.createdDate,
         pdfUrl: documentData.pdfUrl || '',
       })
+
+      // formId가 있으면 추가
+      if (formId) {
+        params.set('formId', formId.toString())
+      }
+
       router.push(`/new/ai?${params.toString()}`)
     } else {
       router.push('/new/ai')
