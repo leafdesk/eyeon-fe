@@ -36,6 +36,8 @@ export interface SignUpRequest {
 export interface UserModifyRequest {
   address: string
   profileImageUrl?: string
+  name?: string
+  phoneNumber?: string
 }
 
 /**
@@ -58,6 +60,7 @@ export interface UserInfoData {
   address: string
   phoneNumber: string
   email: string
+  residentNumber?: string
 }
 
 export interface FormData {

@@ -15,6 +15,34 @@ import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import { UserModifyRequest } from '@/lib/api-types'
 import { useRouter } from 'next/navigation'
+import Script from 'next/script'
+import { User } from 'lucide-react'
+
+// 카카오 우편번호 서비스 타입 정의
+declare global {
+  interface Window {
+    daum: {
+      Postcode: new (options: {
+        oncomplete: (data: {
+          address: string
+          roadAddress: string
+          jibunAddress: string
+          zonecode: string
+        }) => void
+        theme?: {
+          bgColor?: string
+          searchBgColor?: string
+          contentBgColor?: string
+          pageBgColor?: string
+          textColor?: string
+          queryTextColor?: string
+        }
+      }) => {
+        open: () => void
+      }
+    }
+  }
+}
 
 export default function MyInfoPage() {
   const router = useRouter()
@@ -26,9 +54,7 @@ export default function MyInfoPage() {
   const [address, setAddress] = useState('')
   const [detailAddress, setDetailAddress] = useState('')
   const [name, setName] = useState('')
-  const [residentNumber, setResidentNumber] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [email, setEmail] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [profileFile, setProfileFile] = useState<File | null>(null)
@@ -80,6 +106,30 @@ export default function MyInfoPage() {
     }
   }
 
+  // 주소 검색 핸들러
+  const handleAddressSearch = () => {
+    if (typeof window !== 'undefined' && window.daum) {
+      new window.daum.Postcode({
+        oncomplete: function (data) {
+          // 도로명주소 우선, 없으면 지번주소 사용
+          const address = data.roadAddress || data.jibunAddress
+
+          setAddress(address)
+        },
+        theme: {
+          bgColor: '#1e2738',
+          searchBgColor: '#0F1626',
+          contentBgColor: '#1e2738',
+          pageBgColor: '#0F1626',
+          textColor: '#FFFFFF',
+          queryTextColor: '#FFFFFF',
+        },
+      }).open()
+    } else {
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+    }
+  }
+
   // 컴포넌트 마운트 시 사용자 정보 설정
   useEffect(() => {
     // 사용자 정보가 없다면 API 호출
@@ -104,9 +154,6 @@ export default function MyInfoPage() {
       // 기타 정보 설정
       setName(userInfo.username || '')
       setPhoneNumber(userInfo.phoneNumber || '')
-      setEmail(userInfo.email || '')
-      // 주민등록번호는 보안상 표시하지 않거나 마스킹 처리
-      setResidentNumber('******-*******')
     }
   }, [userInfo, loading])
 
@@ -149,22 +196,23 @@ export default function MyInfoPage() {
 
       // 주소 합치기 (상세 주소가 있는 경우)
       const fullAddress = detailAddress
-        ? `${address},${detailAddress}`
+        ? `${address}, ${detailAddress}`
         : address
 
       const userData: UserModifyRequest = {
         address: fullAddress,
+        name: name,
+        phoneNumber: phoneNumber,
       }
 
-      // 프로필 이미지가 변경된 경우, 업로드 예시 (실제로는 서버에 업로드하고 URL을 받아와야 함)
-      // 여기서는 디자인 목적으로 placeholder URL 사용
+      // 프로필 이미지가 변경된 경우
       if (profileFile) {
-        // API에 실제 파일 업로드 로직이 필요함
-        // 예: const uploadResult = await api.user.uploadProfileImage(profileFile);
-        // 그 후 uploadResult.imageUrl을 userData에 설정
+        // TODO: 실제 파일 업로드 API 구현 필요
+        // const uploadResult = await api.user.uploadProfileImage(profileFile)
+        // userData.profileImageUrl = uploadResult.data.imageUrl
 
-        // 임시로 placeholder URL 설정 (실제로는 서버에서 받은 URL 사용)
-        userData.profileImageUrl = 'https://via.placeholder.com/200'
+        // 현재는 파일 업로드 API가 없으므로 기존 이미지 유지
+        console.log('프로필 이미지 업로드 기능은 추후 구현 예정')
       }
 
       const res = await api.user.modifyInfo(userData)
@@ -187,13 +235,33 @@ export default function MyInfoPage() {
     }
   }
 
+  // 주민번호 마스킹 함수 (앞자리 6자리 전부, 뒷자리 첫 1자리만 표시)
+  const maskResidentNumber = (residentNumber?: string) => {
+    if (!residentNumber) return '000000-1******'
+
+    // 주민번호 형식: 123456-1234567
+    const cleaned = residentNumber.replace(/[^0-9]/g, '')
+    if (cleaned.length !== 13) return '000000-1******'
+
+    const front = cleaned.substring(0, 6) // 앞자리 6자리 전부
+    const back = cleaned.substring(6) // 뒷자리 7자리
+
+    return `${front}-${back.charAt(0)}******` // 앞자리 전부 + 뒷자리 첫 1자리
+  }
+
   return (
     <main className="min-h-screen bg-[#0F1626] text-white">
+      {/* 카카오 우편번호 서비스 스크립트 */}
+      <Script
+        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        strategy="afterInteractive"
+      />
+
       {/* Header */}
       <Header left="/my" title="내 정보" right="voice" />
 
       {/* Profile Section */}
-      <div className="flex flex-col items-center my-4">
+      <div className="flex flex-col items-center mt-6 mb-6">
         {/* Hidden file input */}
         <input
           type="file"
@@ -203,24 +271,24 @@ export default function MyInfoPage() {
           className="hidden"
         />
 
-        {/* Profile Image */}
-        <div className="w-[91px] h-[117px]">
-          <Image
-            src={
-              profileImage ||
-              userInfo.profileImageUrl ||
-              '/images/my_profile.png'
-            }
-            alt="Profile"
-            width={91}
-            height={117}
-            className="w-full h-full object-cover"
-          />
+        {/* Profile Image - 마이페이지와 동일한 스타일 */}
+        <div className="w-[91px] h-[117px] bg-[#2A3441] rounded-lg flex items-center justify-center border border-[#3A4553] mb-3">
+          {profileImage || userInfo?.profileImageUrl ? (
+            <Image
+              src={profileImage || userInfo.profileImageUrl}
+              alt="Profile"
+              width={91}
+              height={117}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          ) : (
+            <User className="w-12 h-12 text-[#8B9AAF]" />
+          )}
         </div>
 
         {/* 사진 변경 버튼 */}
         <button
-          className="px-6 bg-[#363C4E] rounded-md text-sm h-[42px] font-semibold text-[15px] mt-2"
+          className="px-6 bg-[#363C4E] rounded-md text-sm h-[42px] font-semibold text-[15px]"
           onClick={handleUploadClick}
         >
           사진 변경
@@ -228,7 +296,7 @@ export default function MyInfoPage() {
       </div>
 
       {/* Form */}
-      <div className="flex-1 flex flex-col pt-4 px-5 space-y-5">
+      <div className="flex-1 flex flex-col px-5 space-y-5">
         {/* Address */}
         <div className="">
           <label className="block text-sm mb-2">주소</label>
@@ -241,7 +309,11 @@ export default function MyInfoPage() {
               onChange={(e) => setAddress(e.target.value)}
               readOnly
             />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs">
+            <button
+              type="button"
+              onClick={handleAddressSearch}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs"
+            >
               주소 검색
             </button>
           </div>
@@ -263,20 +335,6 @@ export default function MyInfoPage() {
             className="w-full bg-[#1e2738] text-white p-4 rounded-md"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            disabled
-          />
-        </div>
-
-        {/* Resident Registration Number */}
-        <div className="">
-          <label className="block text-sm mb-2">주민등록번호</label>
-          <Input
-            type="text"
-            placeholder="주민등록번호를 입력해 주세요"
-            className="w-full bg-[#1e2738] text-gray-300 p-4 rounded-md"
-            value={residentNumber}
-            onChange={(e) => setResidentNumber(e.target.value)}
-            disabled
           />
         </div>
 
@@ -289,28 +347,38 @@ export default function MyInfoPage() {
             className="w-full bg-[#1e2738] text-white p-4 rounded-md"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+        </div>
+
+        {/* 주민등록번호 - 읽기 전용 */}
+        <div className="">
+          <label className="block text-sm mb-2">주민등록번호</label>
+          <Input
+            type="text"
+            placeholder="주민등록번호"
+            className="w-full bg-[#2A3441] text-gray-500 p-4 rounded-md cursor-not-allowed"
+            value={maskResidentNumber(userInfo.residentNumber)}
             disabled
           />
         </div>
 
-        {/* Email */}
+        {/* 이메일 - 읽기 전용 */}
         <div className="">
           <label className="block text-sm mb-2">이메일</label>
           <Input
             type="email"
             placeholder="abc1234@naver.com"
-            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-[#2A3441] text-gray-500 p-4 rounded-md cursor-not-allowed"
+            value={userInfo.email || ''}
             disabled
           />
         </div>
       </div>
 
       {/* blank */}
-      <div className="h-[160px]" />
+      <div className="h-[100px]" />
 
-      {/* Next */}
+      {/* Save Button */}
       <section className="fixed bottom-0 px-5 py-3 w-full">
         <Button onClick={handleSave} disabled={isSaving}>
           {isSaving ? '저장 중...' : '저장하기'}
