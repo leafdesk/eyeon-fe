@@ -7,7 +7,34 @@ import { residentInfoAtom, signupFormAtom } from '@/atoms/residentInfoAtom'
 import api from '@/lib/api'
 import { SignUpRequest } from '@/lib/api-types'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Script from 'next/script'
 // 토스트 컴포넌트가 없는 경우 alert로 대체
+
+// 카카오 우편번호 서비스 타입 정의
+declare global {
+  interface Window {
+    daum: {
+      Postcode: new (options: {
+        oncomplete: (data: {
+          address: string
+          roadAddress: string
+          jibunAddress: string
+          zonecode: string
+        }) => void
+        theme?: {
+          bgColor?: string
+          searchBgColor?: string
+          contentBgColor?: string
+          pageBgColor?: string
+          textColor?: string
+          queryTextColor?: string
+        }
+      }) => {
+        open: () => void
+      }
+    }
+  }
+}
 
 interface Props {
   state: {
@@ -83,6 +110,33 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
       ...prev,
       [name]: value,
     }))
+  }
+
+  // 주소 검색 핸들러
+  const handleAddressSearch = () => {
+    if (typeof window !== 'undefined' && window.daum) {
+      new window.daum.Postcode({
+        oncomplete: function (data) {
+          // 도로명주소 우선, 없으면 지번주소 사용
+          const address = data.roadAddress || data.jibunAddress
+
+          setFormValues((prev) => ({
+            ...prev,
+            address: address,
+          }))
+        },
+        theme: {
+          bgColor: '#1e2738',
+          searchBgColor: '#0F1626',
+          contentBgColor: '#1e2738',
+          pageBgColor: '#0F1626',
+          textColor: '#FFFFFF',
+          queryTextColor: '#FFFFFF',
+        },
+      }).open()
+    } else {
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+    }
   }
 
   // 회원가입 API 호출
@@ -166,6 +220,12 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
+      {/* 카카오 우편번호 서비스 스크립트 */}
+      <Script
+        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        strategy="afterInteractive"
+      />
+
       {/* Header */}
       <section className="w-full fixed top-0 flex items-center justify-between h-[56px] px-5">
         <button onClick={onPrev}>
@@ -192,9 +252,13 @@ export default function Step3Form({ state, setState, onPrev, onNext }: Props) {
               className="w-full bg-[#1e2738] text-gray-300 p-4 pr-20 rounded-md"
               value={formValues.address}
               onChange={handleChange}
-              // readOnly
+              readOnly
             />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs">
+            <button
+              type="button"
+              onClick={handleAddressSearch}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-2 h-6 rounded-[4px] font-semibold text-xs"
+            >
               주소 검색
             </button>
           </div>
