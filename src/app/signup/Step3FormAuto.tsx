@@ -54,6 +54,7 @@ export default function Step3FormAuto({
     name: '',
     phoneNumber: '',
     email: '',
+    residentDate: '',
   })
 
   // URL에서 파라미터 가져오기
@@ -73,6 +74,7 @@ export default function Step3FormAuto({
         name: signupForm.name || '홍길동',
         phoneNumber: signupForm.phoneNumber || '',
         email: emailParam || signupForm.email || '',
+        residentDate: residentInfo?.residentDate || '2001-01-01',
       })
     } else {
       // signupForm이 없을 경우 기본값 설정
@@ -83,9 +85,10 @@ export default function Step3FormAuto({
         name: '홍길동',
         phoneNumber: '',
         email: emailParam || '',
+        residentDate: '2001-01-01',
       })
     }
-  }, [signupForm, emailParam])
+  }, [signupForm, emailParam, residentInfo])
 
   // 입력 필드 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,13 +104,44 @@ export default function Step3FormAuto({
     try {
       setIsLoading(true)
 
+      // 현재 폼 값들 디버깅
+      console.log('현재 formValues:', formValues)
+      console.log('각 필드 체크:')
+      console.log('name:', formValues.name, '비어있음:', !formValues.name)
+      console.log(
+        'residentNumber:',
+        formValues.residentNumber,
+        '비어있음:',
+        !formValues.residentNumber,
+      )
+      console.log(
+        'address:',
+        formValues.address,
+        '비어있음:',
+        !formValues.address,
+      )
+      console.log(
+        'phoneNumber:',
+        formValues.phoneNumber,
+        '비어있음:',
+        !formValues.phoneNumber,
+      )
+      console.log('email:', formValues.email, '비어있음:', !formValues.email)
+      console.log(
+        'residentDate:',
+        formValues.residentDate,
+        '비어있음:',
+        !formValues.residentDate,
+      )
+
       // 필수 필드 검증
       if (
         !formValues.name ||
         !formValues.residentNumber ||
         !formValues.address ||
         !formValues.phoneNumber ||
-        !formValues.email
+        !formValues.email ||
+        !formValues.residentDate
       ) {
         alert('모든 필수 정보를 입력해주세요.')
         return
@@ -124,7 +158,7 @@ export default function Step3FormAuto({
         name: formValues.name,
         kakaoId: kakaoIdParam,
         residentNumber: formValues.residentNumber,
-        residentDate: residentInfo?.residentDate || '2001-01-01',
+        residentDate: formValues.residentDate,
         phoneNumber: formValues.phoneNumber,
         address:
           formValues.address +
@@ -192,9 +226,19 @@ export default function Step3FormAuto({
 
       {/* ID Card Preview */}
       <div className="px-5 pt-4 pb-6">
-        <div className="bg-[#D3D3D3] rounded-lg h-32 flex items-center justify-center">
-          <span className="text-gray-600 text-sm">신분증 촬영본</span>
-        </div>
+        {state.idImage ? (
+          <div className="w-full aspect-[3/2] rounded-lg overflow-hidden bg-gray-200">
+            <img
+              src={URL.createObjectURL(state.idImage)}
+              alt="촬영한 신분증"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full aspect-[3/2] bg-[#D3D3D3] rounded-lg flex items-center justify-center">
+            <span className="text-gray-600 text-sm">신분증 촬영본</span>
+          </div>
+        )}
       </div>
 
       {/* Form */}
@@ -202,63 +246,50 @@ export default function Step3FormAuto({
         {/* Name */}
         <div>
           <label className="block text-sm mb-2">성명</label>
-          <div className="relative">
-            <Input
-              type="text"
-              name="name"
-              placeholder="홍길동"
-              className="w-full bg-[#1e2738] text-white p-4 pr-16 rounded-md"
-              value={formValues.name}
-              onChange={handleChange}
-            />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-3 py-1 rounded-[4px] font-semibold text-xs">
-              수정
-            </button>
-          </div>
+          <Input
+            type="text"
+            name="name"
+            placeholder="홍길동"
+            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+            value={formValues.name}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Resident Registration Number */}
         <div>
           <label className="block text-sm mb-2">주민등록번호</label>
-          <div className="relative">
-            <Input
-              type="text"
-              name="residentNumber"
-              placeholder="000000-0000000"
-              className="w-full bg-[#1e2738] text-white p-4 pr-16 rounded-md"
-              value={formValues.residentNumber}
-              onChange={handleChange}
-            />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-3 py-1 rounded-[4px] font-semibold text-xs">
-              수정
-            </button>
-          </div>
+          <Input
+            type="text"
+            name="residentNumber"
+            placeholder="000000-0000000"
+            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+            value={formValues.residentNumber}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Address */}
         <div>
           <label className="block text-sm mb-2">주소</label>
-          <div className="relative mb-3">
+          <div className="space-y-3">
             <Input
               type="text"
               name="address"
               placeholder="서울 성북구 동소문로 11"
-              className="w-full bg-[#1e2738] text-white p-4 pr-16 rounded-md"
+              className="w-full bg-[#1e2738] text-white p-4 rounded-md"
               value={formValues.address}
               onChange={handleChange}
             />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-3 py-1 rounded-[4px] font-semibold text-xs">
-              수정
-            </button>
+            <Input
+              type="text"
+              name="detailAddress"
+              placeholder="상세 주소"
+              className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+              value={formValues.detailAddress}
+              onChange={handleChange}
+            />
           </div>
-          <Input
-            type="text"
-            name="detailAddress"
-            placeholder="상세 주소"
-            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
-            value={formValues.detailAddress}
-            onChange={handleChange}
-          />
         </div>
 
         {/* Phone Number */}
@@ -277,19 +308,14 @@ export default function Step3FormAuto({
         {/* Issue Date */}
         <div>
           <label className="block text-sm mb-2">발급일자</label>
-          <div className="relative">
-            <Input
-              type="text"
-              name="issueDate"
-              placeholder="0000.00.00"
-              className="w-full bg-[#1e2738] text-white p-4 pr-16 rounded-md"
-              value="0000.00.00"
-              readOnly
-            />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#FFD700] text-[#0F1626] px-3 py-1 rounded-[4px] font-semibold text-xs">
-              수정
-            </button>
-          </div>
+          <Input
+            type="text"
+            name="residentDate"
+            placeholder="2001-01-01"
+            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+            value={formValues.residentDate}
+            onChange={handleChange}
+          />
         </div>
       </div>
 
@@ -301,11 +327,7 @@ export default function Step3FormAuto({
         >
           다시 찍을래요
         </Button>
-        <Button
-          onClick={handleSignUp}
-          disabled={isLoading}
-          className="w-full bg-[#FFD700] text-[#0F1626] hover:bg-[#E6C200]"
-        >
+        <Button onClick={handleSignUp} disabled={isLoading} className="">
           {isLoading ? '처리 중...' : '다음'}
         </Button>
       </section>

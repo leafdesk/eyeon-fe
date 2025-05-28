@@ -92,7 +92,8 @@ export default function CameraCapture({
 
   // 사진 촬영 함수 - 화면 탭 시 호출
   const takePicture = () => {
-    if (!videoRef.current || !canvasRef.current || !streamActive) return
+    if (!videoRef.current || !canvasRef.current || !streamActive || !frameRect)
+      return
 
     const video = videoRef.current
     const canvas = canvasRef.current
@@ -100,12 +101,65 @@ export default function CameraCapture({
 
     if (!context) return
 
-    // 비디오 크기에 맞게 캔버스 설정
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    // 비디오의 실제 크기와 화면에 표시되는 크기
+    const videoActualWidth = video.videoWidth
+    const videoActualHeight = video.videoHeight
+    const videoDisplayWidth = video.offsetWidth
+    const videoDisplayHeight = video.offsetHeight
 
-    // 캔버스에 현재 비디오 프레임 그리기
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    // object-cover로 인한 비디오의 실제 표시 영역 계산
+    const videoAspectRatio = videoActualWidth / videoActualHeight
+    const displayAspectRatio = videoDisplayWidth / videoDisplayHeight
+
+    let scaledVideoWidth, scaledVideoHeight, offsetX, offsetY
+
+    if (videoAspectRatio > displayAspectRatio) {
+      // 비디오가 가로로 잘림
+      scaledVideoHeight = videoDisplayHeight
+      scaledVideoWidth = videoDisplayHeight * videoAspectRatio
+      offsetX = (scaledVideoWidth - videoDisplayWidth) / 2
+      offsetY = 0
+    } else {
+      // 비디오가 세로로 잘림
+      scaledVideoWidth = videoDisplayWidth
+      scaledVideoHeight = videoDisplayWidth / videoAspectRatio
+      offsetX = 0
+      offsetY = (scaledVideoHeight - videoDisplayHeight) / 2
+    }
+
+    // 프레임 영역의 비디오 내 실제 좌표 계산
+    const scaleX = videoActualWidth / scaledVideoWidth
+    const scaleY = videoActualHeight / scaledVideoHeight
+
+    // 비디오 엘리먼트의 화면상 위치
+    const videoRect = video.getBoundingClientRect()
+
+    // 프레임 영역의 비디오 내 상대적 위치 계산
+    const frameRelativeX = frameRect.left - videoRect.left + offsetX
+    const frameRelativeY = frameRect.top - videoRect.top + offsetY
+
+    // 실제 비디오 해상도에서의 좌표
+    const cropX = frameRelativeX * scaleX
+    const cropY = frameRelativeY * scaleY
+    const cropWidth = frameRect.width * scaleX
+    const cropHeight = frameRect.height * scaleY
+
+    // 캔버스를 프레임 크기로 설정
+    canvas.width = cropWidth
+    canvas.height = cropHeight
+
+    // 프레임 영역만 잘라서 캔버스에 그리기
+    context.drawImage(
+      video,
+      cropX,
+      cropY,
+      cropWidth,
+      cropHeight, // 소스 영역 (잘라낼 부분)
+      0,
+      0,
+      cropWidth,
+      cropHeight, // 대상 영역 (캔버스 전체)
+    )
 
     // 이미지를 파일로 변환
     canvas.toBlob(
@@ -113,56 +167,13 @@ export default function CameraCapture({
         if (blob) {
           const file = new File([blob], 'id-card.jpg', { type: 'image/jpeg' })
 
-          /* 실제 구현 (테스트를 위해 주석 처리)
-          api.auth.getResidentInfo(file)
-            .then(response => {
-              console.log('주민등록증 인식 성공:', response.data)
-              
-              // 인식된 데이터 저장
-              const residentData = response.data
-              setResidentInfo(residentData)
-              
-              // 회원가입 폼에 필요한 데이터 설정
-              setSignupForm({
-                name: residentData.name,
-                residentNumber: residentData.residentNumber,
-                address: residentData.address,
-                detailAddress: '',
-                phoneNumber: '',
-                email: ''
-              })
-            })
-            .catch(error => {
-              console.error('주민등록증 인식 실패:', error)
-            })
-            .finally(() => {
-              // API 호출 여부와 상관없이 캡처한 파일을 상위 컴포넌트로 전달
-              onCapture(file)
-            })
-          */
+          console.log('실제 캡처된 이미지로 API 호출 시작')
+          console.log('캡처 영역:', { cropX, cropY, cropWidth, cropHeight })
 
-          // 테스트용 코드: 샘플 이미지로 API 호출
-          console.log(
-            '테스트 이미지 불러오기 시작: /images/id_card_example.jpg',
-          )
-          fetch('/images/id_card_example.jpg')
-            .then((res) => {
-              if (!res.ok) {
-                throw new Error(
-                  `이미지 로드 실패: ${res.status} ${res.statusText}`,
-                )
-              }
-              return res.blob()
-            })
-            .then((imageBlob) => {
-              console.log('테스트 이미지 로드 성공, 크기:', imageBlob.size)
-              const testFile = new File([imageBlob], 'id_card_example.jpg', {
-                type: 'image/jpeg',
-              })
-              return api.auth.getResidentInfo(testFile)
-            })
+          api.auth
+            .getResidentInfo(file)
             .then((response) => {
-              console.log('테스트 주민등록증 인식 성공:', response.data)
+              console.log('주민등록증 인식 성공:', response.data)
 
               // 실제 API 응답 데이터 사용
               const residentData = response.data.data
@@ -179,13 +190,13 @@ export default function CameraCapture({
                 phoneNumber: '',
                 email: '',
               })
+
+              // API 호출이 성공했을 때만 onCapture 호출
+              onCapture(file)
             })
             .catch((error) => {
-              console.error('테스트 주민등록증 인식 실패:', error)
-            })
-            .finally(() => {
-              // 실제 캡처된 파일은 그대로 상위 컴포넌트로 전달
-              onCapture(file)
+              console.error('주민등록증 인식 실패:', error)
+              // API 실패 시에는 onCapture를 호출하지 않음
             })
         }
       },
