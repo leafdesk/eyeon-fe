@@ -3,16 +3,126 @@
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import { Download } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import CustomToast from '@/components/CustomToast'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import api from '@/lib/api'
+import type { DocumentSummaryData } from '@/lib/api-types'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export default function AISummaryPage() {
+function AISummaryContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [showToast, setShowToast] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [summary, setSummary] = useState<DocumentSummaryData | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [documentInfo, setDocumentInfo] = useState<{
+    name: string
+    date: string
+    pdfUrl: string
+  }>({
+    name: '문서 제목',
+    date: '',
+    pdfUrl: '',
+  })
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        setIsLoading(true)
+
+        // URL params에서 문서 정보 가져오기
+        const documentName = searchParams.get('documentName')
+        const createdDate = searchParams.get('createdDate')
+        const pdfUrl = searchParams.get('pdfUrl')
+
+        if (documentName && createdDate) {
+          // 문서 정보 설정
+          const date = new Date(createdDate)
+          const formattedDate = date.toLocaleDateString('ko-KR')
+
+          setDocumentInfo({
+            name: documentName,
+            date: formattedDate,
+            pdfUrl: pdfUrl || '',
+          })
+
+          // TODO: 실제로는 documentId가 필요하지만, 현재 new 플로우에서는 documentId를 받지 못함
+          // 임시로 문서 목록을 조회하여 이름으로 매칭하거나, 다른 방법을 사용해야 함
+          // 지금은 mock 데이터나 기본 요약을 표시
+
+          // 임시 요약 데이터 (실제로는 API에서 가져와야 함)
+          setSummary({
+            summaryText: `${documentName}에 대한 AI 요약이 준비 중입니다.\n\n작성된 문서의 주요 내용과 핵심 포인트를 분석하여 요약본을 제공할 예정입니다.`,
+            pdfFileUrl: pdfUrl || '',
+          })
+        } else {
+          setError('문서 정보를 찾을 수 없습니다.')
+        }
+      } catch (err) {
+        console.error('문서 요약을 불러오는 중 오류가 발생했습니다:', err)
+        setError('문서 요약을 불러오는 중 오류가 발생했습니다.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSummary()
+  }, [searchParams])
 
   const handleDownload = () => {
+    if (documentInfo.pdfUrl) {
+      // 실제 다운로드 로직
+      window.open(documentInfo.pdfUrl, '_blank')
+    }
     setShowToast(true)
+  }
+
+  // 로딩 UI
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
+        <Header title="AI 문서 요약본" left="/new/complete" right="voice" />
+        <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">
+          <Skeleton className="h-6 w-1/2 bg-gray-700 mb-6" />
+          <div className="space-y-5">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i}>
+                  <Skeleton className="h-5 w-40 bg-gray-700 mb-2" />
+                  <div className="space-y-2">
+                    {Array(3)
+                      .fill(0)
+                      .map((_, j) => (
+                        <Skeleton key={j} className="h-4 w-full bg-gray-700" />
+                      ))}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // 에러 UI
+  if (error) {
+    return (
+      <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
+        <Header title="AI 문서 요약본" left="/new/complete" right="voice" />
+        <div className="flex-1 px-6 pt-6 flex flex-col items-center justify-center">
+          <p className="text-red-400 text-center">{error}</p>
+          <Button
+            className="mt-4 bg-white text-black py-2 px-4 rounded-md font-medium"
+            onClick={() => router.push('/new/complete')}
+          >
+            이전 페이지로 돌아가기
+          </Button>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -30,143 +140,14 @@ export default function AISummaryPage() {
       {/* Content */}
       <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">
         {/* Document Title */}
-        <p className="text-gray-400 mb-6">문서 제목</p>
+        <p className="text-gray-400 mb-6">{documentInfo.name}</p>
 
-        {/* Summary Points */}
-        <div className="space-y-5 text-sm mb-8">
-          {/* Point 1 */}
-          <div>
-            <p className="font-medium mb-1">1. 계약 당사자</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>채용권자: 기상청 권기남 장</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>근로자: 양배영</span>
-              </li>
-            </ul>
+        {/* API로부터 받은 요약 정보 표시 */}
+        {summary && (
+          <div className="space-y-5 text-sm mb-8">
+            <div className="whitespace-pre-line">{summary.summaryText}</div>
           </div>
-
-          {/* Point 2 */}
-          <div>
-            <p className="font-medium mb-1">2. 근로계약 기간</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>계약 시작일 ~ 종료일 명시</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>
-                  수습기간: 최대 3개월 이내 가능하며, 평가 후 본 채용 여부 결정
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Point 3 */}
-          <div>
-            <p className="font-medium mb-1">3. 근무장소 및 업무</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>장소: 서울지방기상청</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>직종 및 업무내용: 명시</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>필요시, 근무 장소 및 내용 변경 가능</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Point 4 */}
-          <div>
-            <p className="font-medium mb-1">4. 보수(임금)</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>월급 또는 일급 형태</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>임금 구성 항목:</span>
-              </li>
-              <li className="flex pl-4">
-                <span>
-                  기본급여, 연장/야간/휴일근로수당, 식비, 복지포인트, 면접휴가비
-                  등
-                </span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>지급일: 매월 말일 (또 : 공휴일인면 전일 지급)</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>결근/병역 시 감액</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Point 5 */}
-          <div>
-            <p className="font-medium mb-1">5. 근로시간 및 휴게시간</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>주 월요일~금요일, 09시~18시 (휴게시간 포함)</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>소정근로시간: 1일 8시간, 주 40시간</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>근무시간 조정 가능, 교대근무 가능</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Point 6 */}
-          <div>
-            <p className="font-medium mb-1">6. 휴일 및 휴가</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>유급휴일: 주휴일, 근로자의 날, 공휴일</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>연차, 생리휴가 등은 법규 규정에 따름</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>근무시간 조정 가능, 교대근무 가능</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Point 7 */}
-          <div>
-            <p className="font-medium mb-1">7. 비밀유지의무</p>
-            <ul className="text-gray-300 space-y-1">
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>업무 중 알게 된 비밀 누설 금지</span>
-              </li>
-              <li className="flex">
-                <span className="mr-1">•</span>
-                <span>위반 시 민 · 형사 책임</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* blank */}
@@ -188,5 +169,22 @@ export default function AISummaryPage() {
         </Button>
       </section>
     </main>
+  )
+}
+
+export default function AISummaryPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#0e1525] text-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+            <p>페이지를 불러오는 중...</p>
+          </div>
+        </main>
+      }
+    >
+      <AISummaryContent />
+    </Suspense>
   )
 }

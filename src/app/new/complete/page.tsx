@@ -44,6 +44,20 @@ export default function NewCompletePage() {
     router.push('/main')
   }
 
+  const handleAISummaryClick = () => {
+    if (documentData) {
+      // AI 요약 페이지로 이동하면서 문서 정보를 URL params로 전달
+      const params = new URLSearchParams({
+        documentName: documentData.documentName,
+        createdDate: documentData.createdDate,
+        pdfUrl: documentData.pdfUrl || '',
+      })
+      router.push(`/new/ai?${params.toString()}`)
+    } else {
+      router.push('/new/ai')
+    }
+  }
+
   const handleDownload = async () => {
     if (documentData?.pdfUrl) {
       try {
@@ -115,7 +129,7 @@ export default function NewCompletePage() {
       <section className="px-15">
         <button
           className="w-full bg-[#3F4551] text-white h-[34px] rounded-[6px] flex gap-1 items-center justify-center mb-4 border border-white"
-          onClick={() => router.push('/new/ai')}
+          onClick={handleAISummaryClick}
         >
           <Image
             src="/icons/new_ai.svg"

@@ -146,7 +146,16 @@ function AnalyzeCompleteContent() {
       <section className="px-15">
         <button
           className="w-full bg-[#3F4551] text-white h-[34px] rounded-[6px] flex gap-1 items-center justify-center mb-4 border border-white"
-          onClick={() => router.push('/analyze/ai')}
+          onClick={() => {
+            const documentIdFromUrl = searchParams.get('documentId')
+            const documentIdStr =
+              sessionStorage.getItem('documentId') || documentIdFromUrl
+            if (documentIdStr) {
+              router.push(`/analyze/ai?documentId=${documentIdStr}`)
+            } else {
+              router.push('/analyze/ai')
+            }
+          }}
         >
           <Image
             src="/icons/new_ai.svg"
