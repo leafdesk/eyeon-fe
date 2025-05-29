@@ -3,7 +3,7 @@
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useAtom } from 'jotai'
 import WritingDocumentOverlay from '@/components/WritingDocumentOverlay'
 import { FieldAnalyzeData, DocumentWriteResponseData } from '@/lib/api-types'
@@ -16,7 +16,8 @@ const getFieldKey = (field: FieldAnalyzeData): string => {
   return `${field.field}-${field.index}`
 }
 
-export default function NewWritePage() {
+// useSearchParams를 사용하는 내부 컴포넌트
+function WritePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [userInfo] = useAtom(userInfoAtom)
@@ -121,7 +122,7 @@ export default function NewWritePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0e1525] text-white flex flex-col pb-24">
+    <>
       {/* Header */}
       <Header
         title="문서 작성"
@@ -231,6 +232,29 @@ export default function NewWritePage() {
 
       {/* Writing Overlay */}
       {isWriting && <WritingDocumentOverlay />}
+    </>
+  )
+}
+
+// 로딩 상태 컴포넌트
+function WritePageLoading() {
+  return (
+    <main className="min-h-screen bg-[#0e1525] text-white flex flex-col pb-24">
+      <Header title="문서 작성" left="/new" leftIconType="x" right="voice" />
+      <div className="flex items-center justify-center flex-1">
+        <div className="text-gray-400">로딩 중...</div>
+      </div>
+    </main>
+  )
+}
+
+// 메인 페이지 컴포넌트
+export default function NewWritePage() {
+  return (
+    <main className="min-h-screen bg-[#0e1525] text-white flex flex-col pb-24">
+      <Suspense fallback={<WritePageLoading />}>
+        <WritePageContent />
+      </Suspense>
     </main>
   )
 }
