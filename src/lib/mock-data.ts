@@ -62,6 +62,7 @@ export const userInfoResponseMock = createApiResponse<UserInfoData>({
   address: '서울특별시 강남구 테헤란로 123',
   phoneNumber: '010-1234-5678',
   email: 'example@example.com',
+  gender: 'MALE',
 })
 
 /**
