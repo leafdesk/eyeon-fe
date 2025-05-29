@@ -27,9 +27,13 @@ function AISummaryContent() {
     date: '',
     pdfUrl: '',
   })
-  const { VoiceGuideComponent } = useVoiceGuide(
-    'AI 문서 요약 페이지입니다. 작성된 문서의 AI 요약 내용을 확인할 수 있습니다.',
-  )
+
+  // API 요약 데이터가 있으면 그것을 읽어주고, 없으면 기본 안내 메시지
+  const voiceGuideText = summary?.summaryText
+    ? `AI 문서 요약입니다. ${summary.summaryText}`
+    : 'AI 문서 요약 페이지입니다. 작성된 문서의 AI 요약 내용을 확인할 수 있습니다.'
+
+  const { VoiceGuideComponent } = useVoiceGuide(voiceGuideText)
 
   useEffect(() => {
     const fetchSummary = async () => {
