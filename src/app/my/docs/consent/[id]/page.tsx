@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter, useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import CustomToast from '@/components/CustomToast'
+import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 import api from '@/lib/api'
 import { FormData } from '@/lib/api-types'
 
@@ -16,6 +17,7 @@ export default function ConsentDocPage() {
 
   const [document, setDocument] = useState<FormData | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [showToast, setShowToast] = useState(false)
 
@@ -60,6 +62,47 @@ export default function ConsentDocPage() {
     setShowToast(true)
   }
 
+  // URL의 이미지를 File 객체로 변환하는 함수
+  const urlToFile = async (url: string, filename: string): Promise<File> => {
+    const response = await fetch(url)
+    const blob = await response.blob()
+    return new File([blob], filename, { type: blob.type })
+  }
+
+  const handleWriteDocument = async () => {
+    if (!document?.formUrl) {
+      console.log('문서 이미지 URL이 없습니다.')
+      return
+    }
+
+    setIsAnalyzing(true)
+
+    try {
+      // 1. localStorage에서 analyzedFields 삭제
+      localStorage.removeItem('analyzedFields')
+
+      // 2. 문서 이미지를 File 객체로 변환
+      const imageFile = await urlToFile(
+        document.formUrl,
+        `document-${formId}.png`,
+      )
+
+      // 3. 필드 분석 API 호출
+      const response = await api.form.analyzeField(imageFile)
+      console.log('필드 분석 성공:', response.data)
+
+      // 4. 분석된 필드 데이터를 localStorage에 저장
+      localStorage.setItem('analyzedFields', JSON.stringify(response.data.data))
+
+      // 5. write 페이지로 이동
+      router.push(`/new/write?formId=${formId}`)
+    } catch (error) {
+      console.log('필드 분석 실패:', error)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
   // 날짜 포맷팅 함수
   const formatDate = (dateString?: string) => {
     if (!dateString) return '0000.00.00'
@@ -79,6 +122,9 @@ export default function ConsentDocPage() {
 
   return (
     <main className="min-h-screen bg-[#0F1626] text-white flex flex-col">
+      {/* 문서 읽는 중... */}
+      {isAnalyzing && <ReadingDocumentOverlay />}
+
       <CustomToast
         message="문서 다운로드 완료!"
         isVisible={showToast}
@@ -158,7 +204,8 @@ export default function ConsentDocPage() {
             </Button>
             <Button
               className="h-[48px] text-sm"
-              onClick={() => router.push(`/new/write?formId=${formId}`)}
+              onClick={handleWriteDocument}
+              disabled={isAnalyzing}
             >
               문서 작성하기
             </Button>

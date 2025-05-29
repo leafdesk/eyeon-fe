@@ -21,6 +21,7 @@ export default function SelfIntroPage() {
         setIsLoading(true)
         setError(null)
         const response = await api.form.getList(FORM_TYPES.SELF_INTRO)
+        console.log(response)
 
         if (response.data.isSuccess) {
           setDocuments(response.data.data)
