@@ -2,14 +2,53 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useAtom } from 'jotai'
 import Header from '@/components/Header'
 import { useVoiceGuide } from '@/hooks/useVoiceGuide'
+import {
+  userInfoAtom,
+  userInfoLoadingAtom,
+  userInfoErrorAtom,
+} from '@/atoms/userAtom'
+import api from '@/lib/api'
 
 export default function MainPage() {
   const router = useRouter()
   const { VoiceGuideComponent } = useVoiceGuide(
     '메인 페이지입니다. 필요한 서비스를 선택해 주세요.',
   )
+
+  const [userInfo, setUserInfo] = useAtom(userInfoAtom)
+  const [isLoading, setIsLoading] = useAtom(userInfoLoadingAtom)
+  const [error, setError] = useAtom(userInfoErrorAtom)
+
+  // 사용자 정보 가져오기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        const response = await api.user.getInfo()
+
+        if (response.data.isSuccess) {
+          setUserInfo(response.data.data)
+        } else {
+          setError(
+            response.data.message || '사용자 정보를 가져오는데 실패했습니다.',
+          )
+        }
+      } catch (error) {
+        console.error('사용자 정보 가져오기 실패:', error)
+        setError('사용자 정보를 가져오는데 실패했습니다.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUserInfo()
+  }, [setUserInfo, setIsLoading, setError])
 
   return (
     <div className="min-h-screen bg-[#0e1525] text-white">
@@ -32,7 +71,14 @@ export default function MainPage() {
       {/* Greeting */}
       <div className="text-white mt-7 mb-10 px-5">
         <h1 className="text-[24px] mb-0.5">
-          <strong className="font-semibold">홍길동</strong>님
+          <strong className="font-semibold">
+            {isLoading
+              ? '로딩 중...'
+              : error
+              ? '사용자'
+              : userInfo?.username || '사용자'}
+          </strong>
+          님
         </h1>
         <p className="text-[20px] font-normal">어떤 서비스를 찾고 계신가요?</p>
       </div>

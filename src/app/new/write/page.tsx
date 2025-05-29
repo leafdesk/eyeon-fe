@@ -4,8 +4,10 @@ import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useAtom } from 'jotai'
 import WritingDocumentOverlay from '@/components/WritingDocumentOverlay'
 import { FieldAnalyzeData, DocumentWriteResponseData } from '@/lib/api-types'
+import { userInfoAtom } from '@/atoms/userAtom'
 import api from '@/lib/api'
 import { UI_CONFIG } from '@/lib/constants'
 
@@ -16,6 +18,7 @@ const getFieldKey = (field: FieldAnalyzeData): string => {
 
 export default function NewWritePage() {
   const router = useRouter()
+  const [userInfo] = useAtom(userInfoAtom)
   const [isWriting, setIsWriting] = useState(false)
   const [step, setStep] = useState<'basic' | 'additional'>('basic')
   const [analyzedFields, setAnalyzedFields] = useState<FieldAnalyzeData[]>([])
@@ -145,9 +148,9 @@ export default function NewWritePage() {
               <label className="block text-sm mb-2">성명</label>
               <input
                 type="text"
-                defaultValue="홍길동"
+                defaultValue={userInfo?.username || ''}
                 className="w-full bg-[#252932] text-white px-4 rounded-[6px] h-[48px]"
-                readOnly
+                // readOnly
               />
             </div>
 
@@ -156,9 +159,9 @@ export default function NewWritePage() {
               <label className="block text-sm mb-2">휴대폰 번호</label>
               <input
                 type="tel"
-                defaultValue="010-0000-0000"
+                defaultValue={userInfo?.phoneNumber || ''}
                 className="w-full bg-[#252932] text-white px-4 rounded-[6px] h-[48px]"
-                readOnly
+                // readOnly
               />
             </div>
 
@@ -167,9 +170,9 @@ export default function NewWritePage() {
               <label className="block text-sm mb-2">이메일</label>
               <input
                 type="email"
-                defaultValue="abc1234@naver.com"
+                defaultValue={userInfo?.email || ''}
                 className="w-full bg-[#252932] text-white px-4 rounded-[6px] h-[48px]"
-                readOnly
+                // readOnly
               />
             </div>
           </>

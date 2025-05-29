@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import VoiceGuideToggle from './VoiceGuideToggle'
+import { useAtomValue } from 'jotai'
+import { userInfoAtom } from '@/atoms/userAtom'
 
 interface Props {
   title?: React.ReactNode
@@ -18,6 +20,7 @@ export default function Header({
   right,
 }: Props) {
   const router = useRouter()
+  const userInfo = useAtomValue(userInfoAtom)
 
   return (
     <>
@@ -44,7 +47,14 @@ export default function Header({
         )}
 
         {/* title */}
-        {title && <h1 className="font-semibold text-[20px]">{title}</h1>}
+        {title && (
+          <h1
+            className="font-semibold text-[20px]"
+            onClick={() => console.log(userInfo)}
+          >
+            {title}
+          </h1>
+        )}
 
         {/* right */}
         {right ? (

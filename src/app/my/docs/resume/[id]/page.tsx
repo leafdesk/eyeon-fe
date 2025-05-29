@@ -115,7 +115,33 @@ export default function ResumeDocPage() {
           {/* Document Preview */}
           <section className="px-15 mb-8">
             <div className="bg-white rounded-sm flex items-center justify-center overflow-hidden">
-              <div className="w-full aspect-[7/10] bg-white" />
+              {document?.formUrl ? (
+                <Image
+                  src={document.formUrl}
+                  alt="문서 미리보기"
+                  width={800}
+                  height={1143}
+                  className="w-full aspect-[7/10] object-contain"
+                />
+              ) : (
+                <div className="w-full aspect-[7/10] bg-gray-100 flex items-center justify-center">
+                  <p className="text-gray-500 text-sm">
+                    문서를 불러올 수 없습니다
+                  </p>
+                </div>
+              )}
+              {/* iframe 방식 (보관용) */}
+              {/* {document?.formUrl ? (
+                <iframe
+                  src={document.formUrl}
+                  className="w-full aspect-[7/10]"
+                  title="문서 미리보기"
+                />
+              ) : (
+                <div className="w-full aspect-[7/10] bg-gray-100 flex items-center justify-center">
+                  <p className="text-gray-500 text-sm">문서를 불러올 수 없습니다</p>
+                </div>
+              )} */}
             </div>
           </section>
 
