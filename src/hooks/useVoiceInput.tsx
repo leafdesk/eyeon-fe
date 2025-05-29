@@ -193,27 +193,45 @@ export function useVoiceInput({
 
   // FloatingMicButton을 위한 inputFields 배열 생성
   const inputFields = useMemo(() => {
-    return fields.map((field) => {
+    return fields.map((field, index) => {
       const fieldKey = getFieldKey(field)
       return {
         ref: fieldRefs[fieldKey],
         setValue: (value: string | ((prev: string) => string)) => {
+          // 현재 실제 선택된 필드의 키를 동적으로 가져오기
+          const actualCurrentIndex = currentFieldIndex
+          const actualField = fields[actualCurrentIndex]
+          const actualFieldKey = actualField
+            ? getFieldKey(actualField)
+            : fieldKey
+
+          // 디버깅 로그 추가
+          console.log(
+            `STT 입력: 요청된 필드 인덱스 ${index} → 실제 입력될 필드 인덱스 ${actualCurrentIndex}`,
+          )
+          console.log(
+            `STT 입력: ${
+              actualField?.displayName || 'Unknown'
+            } 필드에 입력됩니다.`,
+          )
+
           if (typeof value === 'function') {
             setFieldValues((prev) => ({
               ...prev,
-              [fieldKey]: value(prev[fieldKey] || ''),
+              [actualFieldKey]: value(prev[actualFieldKey] || ''),
             }))
           } else {
             setFieldValues((prev) => ({
               ...prev,
-              [fieldKey]: value,
+              [actualFieldKey]: value,
             }))
           }
         },
         label: field.displayName,
+        fieldIndex: index, // 디버깅용 인덱스 추가
       }
     })
-  }, [fields, fieldRefs, getFieldKey])
+  }, [fields, fieldRefs, getFieldKey, currentFieldIndex]) // currentFieldIndex 의존성 추가
 
   // API 요청용 헬퍼 함수 - FieldAnalyzeData[] 반환
   const getUpdatedFields = useCallback((): FieldAnalyzeData[] => {
