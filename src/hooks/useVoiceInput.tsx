@@ -202,18 +202,14 @@ export function useVoiceInput({
   // 음성 인식 상태 변경 핸들러
   const handleVoiceStatusChange = useCallback(
     (isListening: boolean, fieldIndex: number) => {
-      // 음성 인식 시작시에만 TTS 실행 (중복 방지)
-      if (
-        isListening &&
-        fieldIndex < fields.length &&
-        fieldIndex !== currentFieldIndex
-      ) {
+      // 음성 인식 시작시에만 TTS 실행
+      if (isListening && fieldIndex < fields.length) {
         const currentField = fields[fieldIndex]
         console.log('현재 선택된 필드 라벨:', currentField.displayName)
         speakFieldLabel(currentField.displayName)
       }
     },
-    [fields, speakFieldLabel, currentFieldIndex],
+    [fields, speakFieldLabel],
   )
 
   // FloatingMicButton을 위한 inputFields 배열 생성
