@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/api'
 import type { DocumentSummaryData } from '@/lib/api-types'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 function AISummaryContent() {
   const router = useRouter()
@@ -26,6 +27,9 @@ function AISummaryContent() {
     date: '',
     pdfUrl: '',
   })
+  const { VoiceGuideComponent } = useVoiceGuide(
+    'AI 문서 요약 페이지입니다. 작성된 문서의 AI 요약 내용을 확인할 수 있습니다.',
+  )
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -150,6 +154,9 @@ function AISummaryContent() {
 
       {/* Header */}
       <Header title="AI 문서 요약본" left="/new/complete" right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Content */}
       <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">

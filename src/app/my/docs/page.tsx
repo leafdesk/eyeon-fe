@@ -3,6 +3,7 @@
 import Header from '@/components/Header'
 import DocTemplateOption from './DocTemplateOption'
 import { useRouter } from 'next/navigation'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 // 문서 양식 데이터
 const docTemplates = [
@@ -15,6 +16,9 @@ const docTemplates = [
 
 export default function MyDocsPage() {
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '내 문서 양식 페이지입니다. 저장된 문서 양식들을 카테고리별로 확인할 수 있습니다. 이력서, 재직증명서, 위임장, 자기소개서, 일일업무일지 양식이 있습니다.',
+  )
 
   const handleTemplateClick = (route: string) => {
     router.push(route)
@@ -24,6 +28,9 @@ export default function MyDocsPage() {
     <main className="min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
       <Header left="/my" title="내 문서 양식" right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Title */}
       <div className="px-6 pt-9 pb-6">

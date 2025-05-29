@@ -12,7 +12,7 @@ import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 export default function NewTemplatePage() {
   const router = useRouter()
   const { VoiceGuideComponent } = useVoiceGuide(
-    '문서 작성 페이지입니다. 어떤 방식으로 문서를 작성할까요? 첫 번째 메뉴는 문서 촬영하기, 두 번째 메뉴는 문서 파일 업로드하기, 세 번째 메뉴는 아이온 양식 사용하기 입니다.',
+    '문서 양식을 선택해주세요. 위임장, 이력서, 일일업무보고서, 자기소개서, 재직증명서 양식이 있습니다.',
   )
 
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)

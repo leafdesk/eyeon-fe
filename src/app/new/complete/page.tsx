@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import CustomToast from '@/components/CustomToast'
 import { DocumentWriteResponseData } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function NewCompletePage() {
   const router = useRouter()
@@ -14,6 +15,9 @@ export default function NewCompletePage() {
   const [documentData, setDocumentData] =
     useState<DocumentWriteResponseData | null>(null)
   const [formattedDate, setFormattedDate] = useState<string>('')
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 작성이 완료되었습니다. 상단에는 AI 문서 요약본 보러가기 버튼이 있고, 하단에는 문서 다운로드와 홈으로 버튼이 있습니다.',
+  )
 
   console.log(documentData)
 
@@ -121,6 +125,9 @@ export default function NewCompletePage() {
 
       {/* Header */}
       <Header right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Title */}
       <div className="text-center mt-3 mb-5 space-y-1">

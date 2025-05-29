@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 import api from '@/lib/api'
 import { base64ToFile } from '@/lib/utils'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function AnalyzeUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -16,6 +17,9 @@ export default function AnalyzeUploadPage() {
   const [loading, setLoading] = useState(false)
   const [isFromScan, setIsFromScan] = useState(false)
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 업로드 페이지입니다. 가운데 버튼을 클릭하면 분석할 문서를 업로드할 수 있습니다.',
+  )
 
   const handleFileSelect = async (file: File) => {
     setSelectedFile(file)
@@ -120,6 +124,9 @@ export default function AnalyzeUploadPage() {
         leftIconType="x"
         right="voice"
       />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Main Content */}
       {selectedFile ? (

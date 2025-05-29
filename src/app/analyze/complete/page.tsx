@@ -8,6 +8,7 @@ import { useState, useEffect, Suspense } from 'react'
 import CustomToast from '@/components/CustomToast'
 import api from '@/lib/api'
 import type { DocumentModifyRequest } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 function AnalyzeCompleteContent() {
   const router = useRouter()
@@ -23,6 +24,9 @@ function AnalyzeCompleteContent() {
     name: '문서 제목',
     date: new Date().toLocaleDateString('ko-KR'),
   })
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 수정이 완료되었습니다. 상단에는 AI 문서 요약본 보러가기 버튼이 있고, 하단에는 문서 다운로드와 홈으로 버튼이 있습니다.',
+  )
 
   console.log('documentInfo', documentInfo)
 
@@ -166,6 +170,9 @@ function AnalyzeCompleteContent() {
       {/* Header */}
       <Header right="voice" />
 
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
+
       {/* Title */}
       <div className="text-center mt-3 mb-5 space-y-1">
         <h1 className="text-[24px] font-semibold">문서 수정 완료</h1>
@@ -206,13 +213,11 @@ function AnalyzeCompleteContent() {
               src={documentInfo.imgUrl}
               alt="문서 미리보기"
               width={300}
-              height={400}
-              className="w-full aspect-[7/10] object-contain"
+              height={424}
+              className="w-full h-auto"
             />
           ) : (
-            <div className="w-full aspect-[7/10] bg-gray-100 flex items-center justify-center">
-              <p className="text-gray-500 text-sm">문서 이미지 로딩 중...</p>
-            </div>
+            <div className="w-full aspect-[7/10] bg-white" />
           )}
         </div>
       </section>

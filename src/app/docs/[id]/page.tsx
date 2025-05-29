@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import CustomToast from '@/components/CustomToast'
 import api from '@/lib/api'
 import { DocumentData } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function DocPage() {
   const router = useRouter()
@@ -20,6 +21,9 @@ export default function DocPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [document, setDocument] = useState<DocumentData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 상세보기 페이지입니다. 문서 내용을 확인하고 하단에는 문서 다운로드와 AI 문서 요약본 버튼이 있습니다.',
+  )
 
   useEffect(() => {
     const fetchDocumentDetail = async () => {
@@ -95,6 +99,9 @@ export default function DocPage() {
 
       {/* Header */}
       <Header title="문서 보관함" right="voice" left="/docs" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Title */}
       {isLoading ? (
