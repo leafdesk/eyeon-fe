@@ -168,8 +168,25 @@ const realApi = {
      * 사용자 정보 수정
      * @param data 수정할 사용자 정보
      */
-    modifyInfo: (data: UserModifyRequest) =>
-      apiClient.put<ApiResponse<null>>('/user/modify', data),
+    modifyInfo: (data: UserModifyRequest) => {
+      const formData = new FormData()
+
+      // data.data를 application/json Content-Type을 가진 Blob으로 추가
+      const jsonBlob = new Blob([JSON.stringify(data.data)], {
+        type: 'application/json',
+      })
+      formData.append('data', jsonBlob)
+
+      if (data.file) {
+        formData.append('file', data.file)
+      }
+
+      return apiClient.put<ApiResponse<null>>('/user/modify', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+    },
 
     /**
      * 사용자 정보 조회

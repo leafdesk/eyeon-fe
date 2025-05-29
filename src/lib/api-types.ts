@@ -34,10 +34,12 @@ export interface SignUpRequest {
 }
 
 export interface UserModifyRequest {
-  address: string
-  profileImageUrl?: string
-  name?: string
-  phoneNumber?: string
+  data: {
+    address: string
+  }
+  file?: File
+  // name?: string
+  // phoneNumber?: string
 }
 
 /**
@@ -61,6 +63,7 @@ export interface UserInfoData {
   phoneNumber: string
   email: string
   residentNumber?: string
+  gender: 'MALE' | 'FEMALE'
 }
 
 export interface FormData {

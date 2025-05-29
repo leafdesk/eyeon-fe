@@ -15,6 +15,35 @@ import {
 } from '@/atoms/userAtom'
 import { toast } from 'sonner'
 
+// 주민번호에서 생년월일 추출하는 함수
+function extractBirthDateFromResidentNumber(residentNumber: string): string {
+  if (!residentNumber || residentNumber.length < 7) return '0000.00.00'
+
+  const yearStr = residentNumber.substring(0, 2)
+  const monthStr = residentNumber.substring(2, 4)
+  const dayStr = residentNumber.substring(4, 6)
+  const genderDigit = residentNumber.substring(6, 7)
+
+  // 성별 숫자로 연도 결정 (1,2: 1900년대, 3,4: 2000년대)
+  let fullYear: string
+  if (genderDigit === '1' || genderDigit === '2') {
+    fullYear = `19${yearStr}`
+  } else if (genderDigit === '3' || genderDigit === '4') {
+    fullYear = `20${yearStr}`
+  } else {
+    // 기본값 처리 (현재 2025년 기준으로 25보다 크면 1900년대, 작거나 같으면 2000년대)
+    const year = parseInt(yearStr)
+    fullYear = year > 25 ? `19${yearStr}` : `20${yearStr}`
+  }
+
+  return `${fullYear}.${monthStr}.${dayStr}`
+}
+
+// 성별을 한자로 변환하는 함수
+function getGenderCharacter(gender: 'MALE' | 'FEMALE'): string {
+  return gender === 'MALE' ? '男' : '女'
+}
+
 export default function MyPage() {
   const router = useRouter()
   const [userInfo, setUserInfo] = useAtom(userInfoAtom)
@@ -88,9 +117,13 @@ export default function MyPage() {
           {loading ? '로딩 중...' : userInfo?.username || '사용자'}
         </h1>
 
-        {/* Birth Date and Gender - Placeholder */}
+        {/* Birth Date and Gender */}
         <p className="text-white">
-          0000.00.00 <span className="text-[#363C4E]">|</span> 女
+          {userInfo?.residentNumber
+            ? extractBirthDateFromResidentNumber(userInfo.residentNumber)
+            : '0000.00.00'}{' '}
+          <span className="text-[#363C4E]">|</span>{' '}
+          {userInfo?.gender ? getGenderCharacter(userInfo.gender) : '女'}
         </p>
       </div>
 

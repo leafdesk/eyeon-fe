@@ -200,21 +200,17 @@ export default function MyInfoPage() {
         : address
 
       const userData: UserModifyRequest = {
-        address: fullAddress,
-        name: name,
-        phoneNumber: phoneNumber,
+        data: {
+          address: fullAddress,
+        },
       }
 
       // 프로필 이미지가 변경된 경우
       if (profileFile) {
-        // TODO: 실제 파일 업로드 API 구현 필요
-        // const uploadResult = await api.user.uploadProfileImage(profileFile)
-        // userData.profileImageUrl = uploadResult.data.imageUrl
-
-        // 현재는 파일 업로드 API가 없으므로 기존 이미지 유지
-        console.log('프로필 이미지 업로드 기능은 추후 구현 예정')
+        userData.file = profileFile
       }
 
+      console.log('userData Request:', userData)
       const res = await api.user.modifyInfo(userData)
 
       if (res.data.isSuccess) {
@@ -223,6 +219,13 @@ export default function MyInfoPage() {
         if (updatedInfo.data.isSuccess) {
           setUserInfo(updatedInfo.data.data)
           toast.success('정보가 성공적으로 저장되었습니다.')
+
+          // 프로필 이미지 상태 초기화
+          setProfileFile(null)
+          if (profileImage) {
+            URL.revokeObjectURL(profileImage)
+            setProfileImage(null)
+          }
         }
       } else {
         toast.error(res.data.message || '정보 저장에 실패했습니다.')
@@ -332,9 +335,9 @@ export default function MyInfoPage() {
           <Input
             type="text"
             placeholder="홍길동"
-            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+            className="w-full bg-[#2A3441] p-4 rounded-md cursor-not-allowed"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            disabled
           />
         </div>
 
@@ -344,9 +347,9 @@ export default function MyInfoPage() {
           <Input
             type="tel"
             placeholder="010-0000-0000"
-            className="w-full bg-[#1e2738] text-white p-4 rounded-md"
+            className="w-full bg-[#2A3441] p-4 rounded-md cursor-not-allowed"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            disabled
           />
         </div>
 
@@ -356,7 +359,7 @@ export default function MyInfoPage() {
           <Input
             type="text"
             placeholder="주민등록번호"
-            className="w-full bg-[#2A3441] text-gray-500 p-4 rounded-md cursor-not-allowed"
+            className="w-full bg-[#2A3441] p-4 rounded-md cursor-not-allowed"
             value={maskResidentNumber(userInfo.residentNumber)}
             disabled
           />
@@ -368,7 +371,7 @@ export default function MyInfoPage() {
           <Input
             type="email"
             placeholder="abc1234@naver.com"
-            className="w-full bg-[#2A3441] text-gray-500 p-4 rounded-md cursor-not-allowed"
+            className="w-full bg-[#2A3441] p-4 rounded-md cursor-not-allowed"
             value={userInfo.email || ''}
             disabled
           />
