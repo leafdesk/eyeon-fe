@@ -16,7 +16,7 @@ import api from '@/lib/api'
 export default function MainPage() {
   const router = useRouter()
   const { VoiceGuideComponent } = useVoiceGuide(
-    '메인 페이지입니다. 필요한 서비스를 선택해 주세요.',
+    '메인 페이지입니다. 메뉴 좌측 상단은 문서 작성, 우측 상단은 문서 분석, 좌측 하단은 문서 보관함, 우측 하단은 마이페이지입니다.',
   )
 
   const [userInfo, setUserInfo] = useAtom(userInfoAtom)

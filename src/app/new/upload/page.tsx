@@ -10,6 +10,7 @@ import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 import api from '@/lib/api'
 import { FieldAnalyzeData, UploadFormResponseData } from '@/lib/api-types'
 import { base64ToFile } from '@/lib/utils'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function NewUploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -18,6 +19,9 @@ export default function NewUploadPage() {
   const [formData, setFormData] = useState<UploadFormResponseData | null>(null)
   const [isFromScan, setIsFromScan] = useState(false)
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 업로드 페이지입니다. 가운데 버튼을 클릭하면 작성할 문서를 업로드할 수 있습니다.',
+  )
 
   const handleFileSelect = async (file: File) => {
     setSelectedFile(file)
@@ -101,6 +105,9 @@ export default function NewUploadPage() {
     <main className="flex flex-col min-h-screen bg-[#0F1626] text-white">
       {/* 문서 읽는 중... */}
       {loading && <ReadingDocumentOverlay />}
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Header */}
       <Header title="문서 업로드" left="/new" leftIconType="x" right="voice" />

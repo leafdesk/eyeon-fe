@@ -7,9 +7,14 @@ import { useRouter } from 'next/navigation'
 import ReadingDocumentOverlay from '@/components/ReadingDocumentOverlay'
 import api from '@/lib/api'
 import { FieldAnalyzeData, UploadFormResponseData } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function NewTemplatePage() {
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 작성 페이지입니다. 어떤 방식으로 문서를 작성할까요? 첫 번째 메뉴는 문서 촬영하기, 두 번째 메뉴는 문서 파일 업로드하기, 세 번째 메뉴는 아이온 양식 사용하기 입니다.',
+  )
+
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -72,6 +77,9 @@ export default function NewTemplatePage() {
     <div className="min-h-screen bg-[#0e1525] text-white flex flex-col">
       {/* 문서 읽는 중... */}
       {loading && <ReadingDocumentOverlay />}
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Header */}
       <Header title="문서 작성" left="/new" right="voice" />

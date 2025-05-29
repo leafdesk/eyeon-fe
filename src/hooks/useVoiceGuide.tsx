@@ -10,9 +10,7 @@ import { TTSOverlay } from '@/app/test/tts/TTSOverlay'
  * @param text 음성 안내 메시지 (기본값 제공)
  * @returns VoiceGuideComponent - 음성 안내 오버레이 컴포넌트
  */
-export function useVoiceGuide(
-  text: string = 'Eye On에 오신 것을 환영합니다. 필요한 기능을 선택해 주세요.',
-) {
+export function useVoiceGuide(text: string = '') {
   const [voiceGuideEnabled] = useAtom(voiceGuideAtom)
   const [showOverlay, setShowOverlay] = useState(true)
   const [isClient, setIsClient] = useState(false)
