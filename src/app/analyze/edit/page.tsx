@@ -102,7 +102,7 @@ export default function AnalyzeEditPage() {
   return (
     <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
       {/* Header */}
-      <Header title="문서 수정" left="/analyze/result" right="voice" />
+      <Header title="문서 수정" left="/analyze/upload" right="voice" />
 
       {/* Title with Pagination */}
       <section className="px-6 pt-6 pb-7 flex justify-between items-start">

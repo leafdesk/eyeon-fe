@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import CustomToast from '@/components/CustomToast'
 import { useRouter, useParams } from 'next/navigation'
 import api from '@/lib/api'
-import { DocumentSummaryData } from '@/lib/api-types'
+import { DocumentSummaryData, DocumentData } from '@/lib/api-types'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function DocAISummaryPage() {
@@ -17,23 +17,31 @@ export default function DocAISummaryPage() {
   const [showToast, setShowToast] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [summary, setSummary] = useState<DocumentSummaryData | null>(null)
+  const [document, setDocument] = useState<DocumentData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchSummary = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true)
-        const response = await api.document.getSummary(parseInt(docId))
-        setSummary(response.data.data)
+
+        // 문서 요약과 문서 상세 정보를 동시에 가져오기
+        const [summaryResponse, documentResponse] = await Promise.all([
+          api.document.getSummary(parseInt(docId)),
+          api.document.getDetail(parseInt(docId)),
+        ])
+
+        setSummary(summaryResponse.data.data)
+        setDocument(documentResponse.data.data)
       } catch (err) {
-        console.error('문서 요약을 불러오는 중 오류가 발생했습니다:', err)
-        setError('문서 요약을 불러오는 중 오류가 발생했습니다.')
+        console.error('문서 정보를 불러오는 중 오류가 발생했습니다:', err)
+        setError('문서 정보를 불러오는 중 오류가 발생했습니다.')
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchSummary()
+    fetchData()
   }, [docId])
 
   const handleDownload = () => {
@@ -105,7 +113,7 @@ export default function DocAISummaryPage() {
       {/* Content */}
       <div className="flex-1 px-6 pt-2 pb-6 flex flex-col">
         {/* Document Title */}
-        <p className="text-gray-400 mb-6">문서 제목</p>
+        <p className="text-gray-400 mb-6">{document?.name || '문서 제목'}</p>
 
         {/* API로부터 받은 요약 정보 표시 */}
         {summary && (

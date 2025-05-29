@@ -25,6 +25,23 @@ export default function MainPage() {
 
   // 사용자 정보 가져오기
   useEffect(() => {
+    // localStorage 초기화 (token과 voiceGuideEnabled 제외)
+    const cleanupLocalStorage = () => {
+      const keysToRemove = [
+        'documentData',
+        'documentInfo',
+        'modifiedData',
+        'adviceData',
+        'documentId',
+        'analyzedFields',
+        'scanData',
+      ]
+
+      keysToRemove.forEach((key) => {
+        localStorage.removeItem(key)
+      })
+    }
+
     const fetchUserInfo = async () => {
       try {
         setIsLoading(true)
@@ -46,6 +63,9 @@ export default function MainPage() {
         setIsLoading(false)
       }
     }
+
+    // localStorage 초기화 실행
+    cleanupLocalStorage()
 
     fetchUserInfo()
   }, [setUserInfo, setIsLoading, setError])

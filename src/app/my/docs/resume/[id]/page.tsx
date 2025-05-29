@@ -21,6 +21,8 @@ export default function ResumeDocPage() {
   const [error, setError] = useState<string | null>(null)
   const [showToast, setShowToast] = useState(false)
 
+  console.log(document)
+
   // API에서 문서 상세 정보 가져오기
   useEffect(() => {
     const fetchDocumentDetail = async () => {
