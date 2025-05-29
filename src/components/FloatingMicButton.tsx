@@ -45,6 +45,8 @@ interface FloatingMicButtonProps {
   inputFields: InputField[]
   lang?: string
   onStatusChange?: (isListening: boolean, currentFieldIndex: number) => void
+  onFieldChange?: (newFieldIndex: number) => void
+  currentFieldIndex?: number
   className?: string
 }
 
@@ -52,12 +54,25 @@ export default function FloatingMicButton({
   inputFields,
   lang = 'ko-KR',
   onStatusChange,
+  onFieldChange,
+  currentFieldIndex: externalCurrentFieldIndex = 0,
   className = '',
 }: FloatingMicButtonProps) {
+  // 입력 필드가 없는 경우 조기 return
+  if (inputFields.length === 0) {
+    return null
+  }
+
   const [isListening, setIsListening] = useState(false)
-  const [isSupported, setIsSupported] = useState(false)
-  const [currentFieldIndex, setCurrentFieldIndex] = useState(0)
+  const [currentFieldIndex, setCurrentFieldIndex] = useState(
+    externalCurrentFieldIndex,
+  )
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+
+  // 외부에서 전달받은 currentFieldIndex와 동기화
+  useEffect(() => {
+    setCurrentFieldIndex(externalCurrentFieldIndex)
+  }, [externalCurrentFieldIndex])
 
   useEffect(() => {
     // 브라우저 지원 확인
@@ -65,8 +80,6 @@ export default function FloatingMicButton({
       typeof window !== 'undefined' &&
       (window.webkitSpeechRecognition || window.SpeechRecognition)
     ) {
-      setIsSupported(true)
-
       // SpeechRecognition 초기화
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition
@@ -108,6 +121,10 @@ export default function FloatingMicButton({
           }
         }
       }
+    } else {
+      console.log(
+        'FloatingMicButton: 브라우저가 음성 인식을 지원하지 않습니다. UI는 렌더링되지만 음성 기능은 비활성화됩니다.',
+      )
     }
   }, [lang, currentFieldIndex, inputFields, onStatusChange])
 
@@ -126,6 +143,7 @@ export default function FloatingMicButton({
     if (currentFieldIndex < inputFields.length - 1) {
       const nextIndex = currentFieldIndex + 1
       setCurrentFieldIndex(nextIndex)
+      onFieldChange?.(nextIndex)
       setTimeout(() => {
         const nextField = inputFields[nextIndex]
         if (nextField?.ref.current) {
@@ -142,6 +160,7 @@ export default function FloatingMicButton({
     if (currentFieldIndex > 0) {
       const prevIndex = currentFieldIndex - 1
       setCurrentFieldIndex(prevIndex)
+      onFieldChange?.(prevIndex)
       setTimeout(() => {
         const prevField = inputFields[prevIndex]
         if (prevField?.ref.current) {
@@ -155,7 +174,12 @@ export default function FloatingMicButton({
   }
 
   const toggleListening = () => {
-    if (!recognitionRef.current || inputFields.length === 0) return
+    if (!recognitionRef.current) {
+      console.log(
+        'FloatingMicButton: 음성 인식이 초기화되지 않았습니다. 브라우저 지원을 확인해주세요.',
+      )
+      return
+    }
 
     if (isListening) {
       recognitionRef.current.stop()
@@ -167,11 +191,6 @@ export default function FloatingMicButton({
       focusCurrentField()
       onStatusChange?.(true, currentFieldIndex)
     }
-  }
-
-  // 입력 필드가 없거나 지원하지 않는 브라우저인 경우 렌더링하지 않음
-  if (!isSupported || inputFields.length === 0) {
-    return null
   }
 
   return (
@@ -190,19 +209,11 @@ export default function FloatingMicButton({
             <ChevronUp className="w-8 h-8 text-gray-700" />
           </button>
 
-          {/* 현재 필드 표시 (큰 점 표시) */}
-          <div className="flex flex-col items-center gap-1 py-2">
-            {inputFields.map((_, index) => (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentFieldIndex ? 'bg-blue-500' : 'bg-gray-300'
-                }`}
-                aria-label={`필드 ${index + 1}${
-                  index === currentFieldIndex ? ' (현재)' : ''
-                }`}
-              />
-            ))}
+          {/* 현재 필드 표시 (숫자로 표시) */}
+          <div className="flex items-center justify-center py-2">
+            <div className="text-sm font-medium text-gray-700">
+              {currentFieldIndex + 1}/{inputFields.length}
+            </div>
           </div>
 
           <button
