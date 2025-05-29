@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import DocItem from './DocItem'
 import api from '@/lib/api'
 import { DocumentData } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 /**
  * 문서 보관함 페이지.
@@ -12,6 +13,9 @@ import { DocumentData } from '@/lib/api-types'
 export default function DocsPage() {
   const [documents, setDocuments] = useState<DocumentData[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 보관함 페이지입니다. 저장된 문서들을 확인할 수 있으며, 각 문서를 터치하여 상세보기나 편집이 가능합니다.',
+  )
 
   useEffect(() => {
     async function fetchDocuments() {
@@ -32,6 +36,9 @@ export default function DocsPage() {
     <main className="min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
       <Header left="/main" title="문서 보관함" right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Document List */}
       <div className="px-5 pt-6 pb-20 space-y-3">

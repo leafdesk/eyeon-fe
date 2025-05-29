@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import DocumentCapture from '@/components/DocumentCapture'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 /**
  * 문서 작성 페이지.
@@ -12,6 +13,9 @@ import { useRouter } from 'next/navigation'
 export default function NewPage() {
   const [showCapture, setShowCapture] = useState(false)
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 작성 페이지입니다. 첫 번째는 문서 촬영하기, 두 번째는 문서 파일 업로드하기, 세 번째는 아이온 양식 사용하기입니다.',
+  )
 
   const handleCapture = (file: File) => {
     // Handle captured file
@@ -23,6 +27,9 @@ export default function NewPage() {
       <main className="min-h-screen bg-[#0F1626] text-white">
         {/* Header */}
         <Header left="/main" title="문서 작성" right="voice" />
+
+        {/* Voice Guide Component */}
+        {VoiceGuideComponent}
 
         {/* Question */}
         <div className="px-6 mt-9 mb-8">
@@ -38,8 +45,8 @@ export default function NewPage() {
         <div className="px-5 space-y-4">
           {/* Take Photo Option */}
           <div
-            className="bg-[#FFD700] text-black rounded-xl p-5 flex justify-between h-[160px] cursor-pointer"
             onClick={() => setShowCapture(true)}
+            className="bg-[#FFD700] text-black rounded-xl p-5 flex justify-between h-[160px] cursor-pointer"
           >
             <div className="text-[#0F1626] text-[24px] font-semibold mt-auto pl-2 pb-1">
               문서

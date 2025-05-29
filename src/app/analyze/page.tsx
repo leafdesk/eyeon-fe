@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import DocumentCapture from '@/components/DocumentCapture'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 /**
  * 문서 분석 페이지.
@@ -12,6 +13,9 @@ import { useRouter } from 'next/navigation'
 export default function AnalyzePage() {
   const [showCapture, setShowCapture] = useState(false)
   const router = useRouter()
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '문서 분석 페이지입니다. 첫 번째는 문서 촬영하기, 두 번째는 문서 파일 업로드하기를 통해 문서를 분석할 수 있습니다.',
+  )
 
   const handleCapture = (file: File) => {
     // Handle captured file
@@ -23,6 +27,9 @@ export default function AnalyzePage() {
       <main className="min-h-screen bg-[#0F1626] text-white">
         {/* Header */}
         <Header left="/main" title="문서 분석" right="voice" />
+
+        {/* Voice Guide Component */}
+        {VoiceGuideComponent}
 
         {/* Question */}
         <div className="px-6 mt-9 mb-8">

@@ -14,6 +14,7 @@ import {
   userInfoErrorAtom,
 } from '@/atoms/userAtom'
 import { toast } from 'sonner'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 // 주민번호에서 생년월일 추출하는 함수
 function extractBirthDateFromResidentNumber(residentNumber: string): string {
@@ -49,6 +50,9 @@ export default function MyPage() {
   const [userInfo, setUserInfo] = useAtom(userInfoAtom)
   const [loading, setLoading] = useAtom(userInfoLoadingAtom)
   const [error, setError] = useAtom(userInfoErrorAtom)
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '마이페이지입니다. 상단에는 프로필 정보가 있고, 하단에는 내 정보와 내 문서 양식 메뉴가 있습니다.',
+  )
 
   console.log(userInfo)
 
@@ -94,6 +98,9 @@ export default function MyPage() {
     <main className="min-h-screen bg-[#0F1626] text-white">
       {/* Header */}
       <Header left="/main" leftIconType="x" title="마이페이지" right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Profile Section */}
       <div className="flex flex-col items-center mt-6 mb-9">
