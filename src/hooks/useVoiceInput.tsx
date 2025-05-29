@@ -18,6 +18,15 @@ export function useVoiceInput({
   // 현재 포커스된 필드 인덱스
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0)
 
+  // currentFieldIndex 변경 추적
+  useEffect(() => {
+    if (fields[currentFieldIndex]) {
+      console.log(
+        `🔢 [useVoiceInput] currentFieldIndex 변경됨: ${currentFieldIndex} (${fields[currentFieldIndex].displayName})`,
+      )
+    }
+  }, [currentFieldIndex, fields])
+
   // 필드 값 상태 관리
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
     const initialValues: Record<string, string> = {}
@@ -143,13 +152,21 @@ export function useVoiceInput({
     (fieldIndex: number) => {
       // 이미 같은 필드가 선택되어 있으면 중복 처리 방지
       if (fieldIndex === currentFieldIndex) {
+        console.log(
+          `🔄 [useVoiceInput] 필드 포커스 중복 방지: 이미 필드 ${fieldIndex}가 선택됨`,
+        )
         return
       }
 
+      console.log(
+        `🎯 [useVoiceInput] 필드 포커스 변경: ${currentFieldIndex} → ${fieldIndex}`,
+      )
       setCurrentFieldIndex(fieldIndex)
       if (fieldIndex < fields.length) {
         const currentField = fields[fieldIndex]
-        console.log('현재 선택된 필드 라벨:', currentField.displayName)
+        console.log(
+          `📢 [useVoiceInput] TTS 실행: "${currentField.displayName}"`,
+        )
         speakFieldLabel(currentField.displayName)
       }
     },
@@ -161,13 +178,21 @@ export function useVoiceInput({
     (newFieldIndex: number) => {
       // 이미 같은 필드가 선택되어 있으면 중복 처리 방지
       if (newFieldIndex === currentFieldIndex) {
+        console.log(
+          `🔄 [useVoiceInput] 필드 변경 중복 방지: 이미 필드 ${newFieldIndex}가 선택됨`,
+        )
         return
       }
 
+      console.log(
+        `🔀 [useVoiceInput] FloatingMicButton에서 필드 변경: ${currentFieldIndex} → ${newFieldIndex}`,
+      )
       setCurrentFieldIndex(newFieldIndex)
       if (newFieldIndex < fields.length) {
         const currentField = fields[newFieldIndex]
-        console.log('현재 선택된 필드 라벨:', currentField.displayName)
+        console.log(
+          `📢 [useVoiceInput] TTS 실행: "${currentField.displayName}"`,
+        )
         speakFieldLabel(currentField.displayName)
       }
     },
@@ -206,21 +231,31 @@ export function useVoiceInput({
             : fieldKey
 
           // 디버깅 로그 추가
+          console.log(`🎤 [useVoiceInput] STT setValue 호출:`)
           console.log(
-            `STT 입력: 요청된 필드 인덱스 ${index} → 실제 입력될 필드 인덱스 ${actualCurrentIndex}`,
+            `   - 요청된 필드 인덱스: ${index} (${field.displayName})`,
           )
+          console.log(`   - 실제 currentFieldIndex: ${actualCurrentIndex}`)
           console.log(
-            `STT 입력: ${
-              actualField?.displayName || 'Unknown'
-            } 필드에 입력됩니다.`,
+            `   - 실제 입력될 필드: ${actualField?.displayName || 'Unknown'}`,
           )
+          console.log(`   - 요청된 fieldKey: ${fieldKey}`)
+          console.log(`   - 실제 사용될 fieldKey: ${actualFieldKey}`)
 
           if (typeof value === 'function') {
-            setFieldValues((prev) => ({
-              ...prev,
-              [actualFieldKey]: value(prev[actualFieldKey] || ''),
-            }))
+            setFieldValues((prev) => {
+              const oldValue = prev[actualFieldKey] || ''
+              const newValue = value(oldValue)
+              console.log(
+                `📝 [useVoiceInput] setValue 함수형 실행: "${oldValue}" → "${newValue}"`,
+              )
+              return {
+                ...prev,
+                [actualFieldKey]: newValue,
+              }
+            })
           } else {
+            console.log(`📝 [useVoiceInput] setValue 직접 값 설정: "${value}"`)
             setFieldValues((prev) => ({
               ...prev,
               [actualFieldKey]: value,

@@ -103,14 +103,36 @@ export default function FloatingMicButton({
 
             if (finalTranscript && inputFields[currentFieldIndex]) {
               const currentField = inputFields[currentFieldIndex]
-              currentField.setValue((prev) => prev + finalTranscript)
+              console.log(`🎤 [FloatingMicButton] STT 입력 감지:`)
+              console.log(`   - 현재 인덱스: ${currentFieldIndex}`)
+              console.log(`   - 현재 필드 라벨: ${currentField.label}`)
+              console.log(`   - 인식된 텍스트: "${finalTranscript}"`)
+              console.log(`   - 입력 필드들 총 개수: ${inputFields.length}`)
+
+              currentField.setValue((prev) => {
+                const newValue = prev + finalTranscript
+                console.log(
+                  `📝 [FloatingMicButton] setValue 실행: "${prev}" → "${newValue}"`,
+                )
+                return newValue
+              })
             }
           }
 
           recognitionRef.current.onerror = (
             event: SpeechRecognitionErrorEvent,
           ) => {
-            console.error('Speech recognition error:', event.error)
+            // no-speech는 정상적인 동작이므로 에러로 처리하지 않음
+            if (event.error === 'no-speech') {
+              console.log(
+                '🔇 [FloatingMicButton] 음성이 감지되지 않아 자동 종료됨 (정상)',
+              )
+            } else {
+              console.error(
+                '❌ [FloatingMicButton] 음성 인식 오류:',
+                event.error,
+              )
+            }
             setIsListening(false)
             onStatusChange?.(false, currentFieldIndex)
           }
@@ -142,6 +164,9 @@ export default function FloatingMicButton({
   const moveToNextField = () => {
     if (currentFieldIndex < inputFields.length - 1) {
       const nextIndex = currentFieldIndex + 1
+      console.log(
+        `\n\n\n🔄 [FloatingMicButton] 다음 필드로 이동: ${currentFieldIndex} → ${nextIndex}`,
+      )
       setCurrentFieldIndex(nextIndex)
       onFieldChange?.(nextIndex)
       setTimeout(() => {
@@ -151,6 +176,9 @@ export default function FloatingMicButton({
           const element = nextField.ref.current
           const length = element.value.length
           element.setSelectionRange(length, length)
+          console.log(
+            `✅ [FloatingMicButton] 다음 필드 포커스 완료: index ${nextIndex}, label: ${nextField.label}`,
+          )
         }
       }, 100)
     }
@@ -159,6 +187,9 @@ export default function FloatingMicButton({
   const moveToPrevField = () => {
     if (currentFieldIndex > 0) {
       const prevIndex = currentFieldIndex - 1
+      console.log(
+        `🔄 [FloatingMicButton] 이전 필드로 이동: ${currentFieldIndex} → ${prevIndex}`,
+      )
       setCurrentFieldIndex(prevIndex)
       onFieldChange?.(prevIndex)
       setTimeout(() => {
@@ -168,6 +199,9 @@ export default function FloatingMicButton({
           const element = prevField.ref.current
           const length = element.value.length
           element.setSelectionRange(length, length)
+          console.log(
+            `✅ [FloatingMicButton] 이전 필드 포커스 완료: index ${prevIndex}, label: ${prevField.label}`,
+          )
         }
       }, 100)
     }
@@ -182,10 +216,16 @@ export default function FloatingMicButton({
     }
 
     if (isListening) {
+      console.log(
+        `🔴 [FloatingMicButton] 음성 인식 중지 (현재 필드: ${currentFieldIndex})`,
+      )
       recognitionRef.current.stop()
       setIsListening(false)
       onStatusChange?.(false, currentFieldIndex)
     } else {
+      console.log(
+        `🟢 [FloatingMicButton] 음성 인식 시작 (현재 필드: ${currentFieldIndex})`,
+      )
       recognitionRef.current.start()
       setIsListening(true)
       focusCurrentField()
