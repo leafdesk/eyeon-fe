@@ -38,8 +38,48 @@ export default function DocPage() {
     fetchDocumentDetail()
   }, [docId])
 
-  const handleDownload = () => {
-    setShowToast(true)
+  const handleDownload = async () => {
+    if (document?.documentUrl) {
+      try {
+        // PDF 파일을 fetch로 가져오기
+        const response = await fetch(document.documentUrl)
+        if (!response.ok) {
+          throw new Error('PDF 다운로드에 실패했습니다.')
+        }
+
+        // Blob으로 변환
+        const blob = await response.blob()
+
+        // Blob URL 생성
+        const blobUrl = window.URL.createObjectURL(blob)
+
+        // 다운로드 링크 생성 및 클릭
+        const link = window.document.createElement('a')
+        link.href = blobUrl
+        link.download = document.name || '문서.pdf'
+        window.document.body.appendChild(link)
+        link.click()
+
+        // 정리
+        window.document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+
+        // 다운로드 완료 토스트 표시
+        setShowToast(true)
+      } catch (error) {
+        console.error('PDF 다운로드 오류:', error)
+        // 실패 시 기존 방식으로 시도
+        const link = window.document.createElement('a')
+        link.href = document.documentUrl
+        link.download = document.name || '문서.pdf'
+        link.target = '_blank'
+        window.document.body.appendChild(link)
+        link.click()
+        window.document.body.removeChild(link)
+
+        setShowToast(true)
+      }
+    }
   }
 
   console.log('document', document)
@@ -120,6 +160,7 @@ export default function DocPage() {
         <Button
           className="bg-[#FFD700] h-[48px] text-sm"
           onClick={handleDownload}
+          disabled={!document?.documentUrl}
         >
           문서 다운로드
         </Button>

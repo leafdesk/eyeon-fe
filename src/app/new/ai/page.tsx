@@ -36,7 +36,7 @@ function AISummaryContent() {
         const documentName = searchParams.get('documentName')
         const createdDate = searchParams.get('createdDate')
         const pdfUrl = searchParams.get('pdfUrl')
-        const formIdStr = searchParams.get('formId')
+        const documentIdStr = searchParams.get('documentId')
 
         if (documentName && createdDate) {
           // 문서 정보 설정
@@ -49,12 +49,12 @@ function AISummaryContent() {
             pdfUrl: pdfUrl || '',
           })
 
-          // formId가 있으면 실제 API 호출 시도
-          if (formIdStr) {
+          // documentId가 있으면 실제 API 호출 시도
+          if (documentIdStr) {
             try {
-              const formId = parseInt(formIdStr)
-              // formId를 documentId로 사용하여 문서 요약 조회
-              const response = await api.document.getSummary(formId)
+              const documentId = parseInt(documentIdStr)
+              // documentId를 사용하여 문서 요약 조회
+              const response = await api.document.getSummary(documentId)
               setSummary(response.data.data)
             } catch (apiError) {
               console.error('API 호출 실패:', apiError)
@@ -65,7 +65,7 @@ function AISummaryContent() {
               })
             }
           } else {
-            // formId가 없으면 기본 요약 표시
+            // documentId가 없으면 기본 요약 표시
             setSummary({
               summaryText: `${documentName}에 대한 AI 요약이 준비 중입니다.\n\n작성된 문서의 주요 내용과 핵심 포인트를 분석하여 요약본을 제공할 예정입니다.`,
               pdfFileUrl: pdfUrl || '',

@@ -132,6 +132,7 @@ export interface DocumentWriteRequest {
 }
 
 export interface DocumentWriteResponseData {
+  documentId: number
   documentName: string
   createdDate: string
   imageUrl: string
