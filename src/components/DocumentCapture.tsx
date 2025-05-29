@@ -118,34 +118,45 @@ export default function DocumentCapture({
           try {
             setIsLoading(true)
 
-            // AI 스캔 API 호출
-            const response = await api.ai.scan(file)
-            console.log('AI 스캔 성공:', response.data)
+            // AI 스캔 API 호출 시도
+            try {
+              const response = await api.ai.scan(file)
+              console.log('AI 스캔 성공:', response.data)
 
-            // 현재 경로에 따라 적절한 페이지로 이동
-            const scanData = response.data
+              // 현재 경로에 따라 적절한 페이지로 이동
+              const scanData = response.data
 
-            // 스캔 데이터를 sessionStorage에 저장
-            sessionStorage.setItem('scanData', JSON.stringify(scanData))
-            sessionStorage.setItem(
-              'originalFile',
-              JSON.stringify({
-                name: file.name,
-                size: file.size,
-                type: file.type,
-              }),
-            )
+              // 스캔 데이터를 sessionStorage에 저장
+              sessionStorage.setItem('scanData', JSON.stringify(scanData))
+              sessionStorage.setItem(
+                'originalFile',
+                JSON.stringify({
+                  name: file.name,
+                  size: file.size,
+                  type: file.type,
+                }),
+              )
 
-            if (pathname.includes('/new')) {
-              // /new에서 온 경우 -> /new/upload로 이동
-              router.push('/new/upload')
-            } else if (pathname.includes('/analyze')) {
-              // /analyze에서 온 경우 -> /analyze/upload로 이동
-              router.push('/analyze/upload')
+              if (pathname.includes('/new')) {
+                // /new에서 온 경우 -> /new/upload로 이동
+                router.push('/new/upload')
+              } else if (pathname.includes('/analyze')) {
+                // /analyze에서 온 경우 -> /analyze/upload로 이동
+                router.push('/analyze/upload')
+              }
+              return // 성공했으면 여기서 종료
+            } catch (scanError) {
+              console.warn(
+                'AI 스캔 실패, 상위 컴포넌트로 파일 전달:',
+                scanError,
+              )
             }
+
+            // AI 스캔이 실패했거나 다른 처리가 필요한 경우 상위 컴포넌트에 파일 전달
+            onCapture(file)
           } catch (error) {
-            console.error('AI 스캔 실패:', error)
-            // 에러 발생 시에도 원본 파일은 전달
+            console.error('문서 캡처 처리 실패:', error)
+            // 모든 처리가 실패해도 파일은 전달
             onCapture(file)
           } finally {
             setIsLoading(false)
