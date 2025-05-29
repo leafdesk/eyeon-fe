@@ -67,7 +67,11 @@ export default function FloatingMicButton({
   const [currentFieldIndex, setCurrentFieldIndex] = useState(
     externalCurrentFieldIndex,
   )
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+
+  // 원본 viewport 높이를 저장 (키보드가 올라오기 전 높이)
+  const originalViewportHeight = useRef<number>(0)
 
   // 최신 currentFieldIndex를 참조하기 위한 ref
   const currentFieldIndexRef = useRef(currentFieldIndex)
@@ -82,6 +86,61 @@ export default function FloatingMicButton({
   useEffect(() => {
     currentFieldIndexRef.current = currentFieldIndex
   }, [currentFieldIndex])
+
+  // 키보드 감지 및 높이 계산
+  useEffect(() => {
+    // 원본 viewport 높이 저장 (페이지 로드 시)
+    if (typeof window !== 'undefined') {
+      originalViewportHeight.current = window.innerHeight
+    }
+
+    const handleViewportChange = () => {
+      if (typeof window !== 'undefined' && window.visualViewport) {
+        const viewport = window.visualViewport
+        const originalHeight = originalViewportHeight.current
+        const viewportHeight = viewport.height
+
+        // 원본 높이 기준으로 키보드 높이 계산
+        const keyboardHeight = Math.max(0, originalHeight - viewportHeight)
+        setKeyboardHeight(keyboardHeight)
+
+        console.log(
+          `📱 [FloatingMicButton] 키보드 높이 변화: ${keyboardHeight}px (원본: ${originalHeight}px, 현재: ${viewportHeight}px)`,
+        )
+      }
+    }
+
+    // 모바일 환경에서 키보드 감지
+    if (typeof window !== 'undefined') {
+      if (window.visualViewport) {
+        // 최신 브라우저의 visualViewport API 사용
+        window.visualViewport.addEventListener('resize', handleViewportChange)
+        handleViewportChange() // 초기값 설정
+
+        return () => {
+          window.visualViewport?.removeEventListener(
+            'resize',
+            handleViewportChange,
+          )
+        }
+      } else {
+        // 구형 브라우저 대비 fallback
+        const handleResize = () => {
+          const initialHeight = originalViewportHeight.current
+          setTimeout(() => {
+            const currentHeight = window.innerHeight
+            const heightDiff = Math.max(0, initialHeight - currentHeight)
+            setKeyboardHeight(heightDiff)
+          }, 100)
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => {
+          window.removeEventListener('resize', handleResize)
+        }
+      }
+    }
+  }, [])
 
   useEffect(() => {
     // 브라우저 지원 확인
@@ -251,11 +310,32 @@ export default function FloatingMicButton({
 
   return (
     <div
-      className={`fixed bottom-6 right-6 flex flex-col items-end gap-2 ${className}`}
+      className={`fixed flex flex-col items-end gap-2 ${className}`}
+      style={{
+        bottom: `${24 + keyboardHeight}px`, // 기본 24px(bottom-6) + 키보드 높이
+        right: '24px', // right-6 = 24px
+        zIndex: 9999, // 최상위 레이어에 배치
+        position: 'fixed', // 명시적으로 fixed 재선언
+        transition: 'bottom 0.3s ease-in-out', // 부드러운 애니메이션
+        transform: 'translateZ(0)', // GPU 가속 활성화로 position fixed 보장
+        willChange: 'bottom', // 성능 최적화
+        // 모바일에서 스크롤 시 position fixed 보장
+        WebkitTransform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        perspective: 1000,
+      }}
     >
       {/* 필드 네비게이션 버튼들 (음성 인식 중일 때만 표시) */}
       {isListening && inputFields.length > 1 && (
-        <div className="flex flex-col gap-2 bg-[#0e1525] rounded-lg shadow-lg p-3 border border-[#FFD700]/20">
+        <div
+          className="flex flex-col gap-2 bg-[#0e1525] rounded-lg shadow-lg p-3 border border-[#FFD700]/20"
+          style={{
+            transition: 'all 0.3s ease-in-out', // 부드러운 애니메이션
+            transform: 'translateZ(0)', // GPU 가속 활성화
+            WebkitTransform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+          }}
+        >
           <button
             onClick={moveToPrevField}
             disabled={currentFieldIndex === 0}
@@ -291,6 +371,12 @@ export default function FloatingMicButton({
             ? 'bg-red-500 hover:bg-red-600 animate-pulse'
             : 'bg-[#FFD700] hover:bg-[#FFD700]/90'
         }`}
+        style={{
+          transition: 'all 0.3s ease-in-out', // 부드러운 애니메이션
+          transform: 'translateZ(0)', // GPU 가속 활성화
+          WebkitTransform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+        }}
         aria-label={isListening ? '음성 인식 중지' : '음성 인식 시작'}
       >
         {isListening ? (
