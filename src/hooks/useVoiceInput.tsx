@@ -223,42 +223,28 @@ export function useVoiceInput({
       return {
         ref: fieldRefs[fieldKey],
         setValue: (value: string | ((prev: string) => string)) => {
-          // 현재 실제 선택된 필드의 키를 동적으로 가져오기
-          const actualCurrentIndex = currentFieldIndex
-          const actualField = fields[actualCurrentIndex]
-          const actualFieldKey = actualField
-            ? getFieldKey(actualField)
-            : fieldKey
-
-          // 디버깅 로그 추가
+          // 각 필드는 자신의 fieldKey에만 값을 설정
           console.log(`🎤 [useVoiceInput] STT setValue 호출:`)
-          console.log(
-            `   - 요청된 필드 인덱스: ${index} (${field.displayName})`,
-          )
-          console.log(`   - 실제 currentFieldIndex: ${actualCurrentIndex}`)
-          console.log(
-            `   - 실제 입력될 필드: ${actualField?.displayName || 'Unknown'}`,
-          )
-          console.log(`   - 요청된 fieldKey: ${fieldKey}`)
-          console.log(`   - 실제 사용될 fieldKey: ${actualFieldKey}`)
+          console.log(`   - 필드 인덱스: ${index} (${field.displayName})`)
+          console.log(`   - fieldKey: ${fieldKey}`)
 
           if (typeof value === 'function') {
             setFieldValues((prev) => {
-              const oldValue = prev[actualFieldKey] || ''
+              const oldValue = prev[fieldKey] || ''
               const newValue = value(oldValue)
               console.log(
                 `📝 [useVoiceInput] setValue 함수형 실행: "${oldValue}" → "${newValue}"`,
               )
               return {
                 ...prev,
-                [actualFieldKey]: newValue,
+                [fieldKey]: newValue,
               }
             })
           } else {
             console.log(`📝 [useVoiceInput] setValue 직접 값 설정: "${value}"`)
             setFieldValues((prev) => ({
               ...prev,
-              [actualFieldKey]: value,
+              [fieldKey]: value,
             }))
           }
         },
@@ -266,7 +252,7 @@ export function useVoiceInput({
         fieldIndex: index, // 디버깅용 인덱스 추가
       }
     })
-  }, [fields, fieldRefs, getFieldKey, currentFieldIndex]) // currentFieldIndex 의존성 추가
+  }, [fields, fieldRefs, getFieldKey]) // currentFieldIndex 의존성 제거
 
   // API 요청용 헬퍼 함수 - FieldAnalyzeData[] 반환
   const getUpdatedFields = useCallback((): FieldAnalyzeData[] => {
