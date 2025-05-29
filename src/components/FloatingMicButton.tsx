@@ -199,19 +199,19 @@ export default function FloatingMicButton({
     >
       {/* 필드 네비게이션 버튼들 (음성 인식 중일 때만 표시) */}
       {isListening && inputFields.length > 1 && (
-        <div className="flex flex-col gap-2 bg-white rounded-lg shadow-lg p-3">
+        <div className="flex flex-col gap-2 bg-[#0e1525] rounded-lg shadow-lg p-3 border border-[#FFD700]/20">
           <button
             onClick={moveToPrevField}
             disabled={currentFieldIndex === 0}
-            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center"
+            className="w-12 h-12 bg-[#FFD700]/10 hover:bg-[#FFD700]/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center border border-[#FFD700]/30"
             aria-label="이전 필드로 이동"
           >
-            <ChevronUp className="w-8 h-8 text-gray-700" />
+            <ChevronUp className="w-8 h-8 text-[#FFD700]" />
           </button>
 
           {/* 현재 필드 표시 (숫자로 표시) */}
           <div className="flex items-center justify-center py-2">
-            <div className="text-sm font-medium text-gray-700">
+            <div className="text-sm font-medium text-[#FFD700]">
               {currentFieldIndex + 1}/{inputFields.length}
             </div>
           </div>
@@ -219,10 +219,10 @@ export default function FloatingMicButton({
           <button
             onClick={moveToNextField}
             disabled={currentFieldIndex === inputFields.length - 1}
-            className="w-12 h-12 bg-gray-100 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center"
+            className="w-12 h-12 bg-[#FFD700]/10 hover:bg-[#FFD700]/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center border border-[#FFD700]/30"
             aria-label="다음 필드로 이동"
           >
-            <ChevronDown className="w-8 h-8 text-gray-700" />
+            <ChevronDown className="w-8 h-8 text-[#FFD700]" />
           </button>
         </div>
       )}
