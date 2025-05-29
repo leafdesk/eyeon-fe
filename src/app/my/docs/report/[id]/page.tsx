@@ -158,7 +158,7 @@ export default function ReportDocPage() {
             </Button>
             <Button
               className="h-[48px] text-sm"
-              onClick={() => router.push('/new/write')}
+              onClick={() => router.push(`/new/write?formId=${formId}`)}
             >
               문서 작성하기
             </Button>

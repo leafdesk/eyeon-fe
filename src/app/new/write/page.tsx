@@ -2,7 +2,7 @@
 
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAtom } from 'jotai'
 import WritingDocumentOverlay from '@/components/WritingDocumentOverlay'
@@ -18,6 +18,7 @@ const getFieldKey = (field: FieldAnalyzeData): string => {
 
 export default function NewWritePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [userInfo] = useAtom(userInfoAtom)
   const [isWriting, setIsWriting] = useState(false)
   const [step, setStep] = useState<'basic' | 'additional'>('basic')
@@ -26,11 +27,18 @@ export default function NewWritePage() {
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
 
-  // 로컬 스토리지에서 분석된 필드 데이터와 formId 가져오기
+  console.log('userInfo (/new/write)', userInfo)
+
+  // URL 매개변수에서 formId를 가져오고 로컬 스토리지에서 분석된 필드 데이터 가져오기
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // URL 매개변수에서 formId 가져오기
+      const formIdParam = searchParams.get('formId')
+      if (formIdParam) {
+        setFormId(parseInt(formIdParam))
+      }
+
       const storedFields = localStorage.getItem('analyzedFields')
-      const storedFormId = localStorage.getItem('formId')
 
       if (storedFields) {
         const fields = JSON.parse(storedFields) as FieldAnalyzeData[]
@@ -44,12 +52,8 @@ export default function NewWritePage() {
         })
         setFieldValues(initialValues)
       }
-
-      if (storedFormId) {
-        setFormId(parseInt(storedFormId))
-      }
     }
-  }, [])
+  }, [searchParams])
 
   // 필드 값 변경 핸들러 - field와 index로 구성된 고유 키 사용
   const handleFieldChange = (fieldKey: string, value: string) => {

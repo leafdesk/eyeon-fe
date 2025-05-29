@@ -56,15 +56,14 @@ export default function NewTemplatePage() {
       const analyzeResponse = await api.form.analyzeField(templateFile)
       console.log('필드 분석 성공:', analyzeResponse.data)
 
-      // 4. 분석된 필드 데이터와 formId를 로컬 스토리지에 저장
+      // 4. 분석된 필드 데이터를 로컬 스토리지에 저장 (formId는 URL로 전달)
       localStorage.setItem(
         'analyzedFields',
         JSON.stringify(analyzeResponse.data.data),
       )
-      localStorage.setItem('formId', formData.formId.toString())
 
-      // 5. write 페이지로 이동
-      router.push('/new/write')
+      // 5. write 페이지로 formId를 URL 매개변수로 전달하며 이동
+      router.push(`/new/write?formId=${formData.formId}`)
     } catch (error) {
       console.error('템플릿 처리 실패:', error)
       alert('템플릿 처리에 실패했습니다.')

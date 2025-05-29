@@ -88,11 +88,10 @@ export default function NewUploadPage() {
       const response = await api.form.analyzeField(selectedFile)
       console.log('필드 분석 성공:', response.data)
 
-      // 분석된 필드 데이터와 formId를 로컬 스토리지에 저장
+      // 분석된 필드 데이터를 로컬 스토리지에 저장 (formId는 URL로 전달)
       localStorage.setItem('analyzedFields', JSON.stringify(response.data.data))
-      localStorage.setItem('formId', formData.formId.toString())
 
-      router.push('/new/write')
+      router.push(`/new/write?formId=${formData.formId}`)
     } catch (error) {
       console.error('필드 분석 실패:', error)
       alert('문서 필드 분석에 실패했습니다.')
