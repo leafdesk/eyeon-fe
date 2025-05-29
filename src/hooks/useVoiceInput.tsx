@@ -141,6 +141,11 @@ export function useVoiceInput({
   // 필드 포커스 핸들러 (직접 클릭시)
   const handleFieldFocus = useCallback(
     (fieldIndex: number) => {
+      // 이미 같은 필드가 선택되어 있으면 중복 처리 방지
+      if (fieldIndex === currentFieldIndex) {
+        return
+      }
+
       setCurrentFieldIndex(fieldIndex)
       if (fieldIndex < fields.length) {
         const currentField = fields[fieldIndex]
@@ -148,12 +153,17 @@ export function useVoiceInput({
         speakFieldLabel(currentField.displayName)
       }
     },
-    [fields, speakFieldLabel],
+    [fields, speakFieldLabel, currentFieldIndex],
   )
 
   // 필드 변경 핸들러 (FloatingMicButton에서 호출)
   const handleFieldChange = useCallback(
     (newFieldIndex: number) => {
+      // 이미 같은 필드가 선택되어 있으면 중복 처리 방지
+      if (newFieldIndex === currentFieldIndex) {
+        return
+      }
+
       setCurrentFieldIndex(newFieldIndex)
       if (newFieldIndex < fields.length) {
         const currentField = fields[newFieldIndex]
@@ -161,19 +171,24 @@ export function useVoiceInput({
         speakFieldLabel(currentField.displayName)
       }
     },
-    [fields, speakFieldLabel],
+    [fields, speakFieldLabel, currentFieldIndex],
   )
 
   // 음성 인식 상태 변경 핸들러
   const handleVoiceStatusChange = useCallback(
     (isListening: boolean, fieldIndex: number) => {
-      if (isListening && fieldIndex < fields.length) {
+      // 음성 인식 시작시에만 TTS 실행 (중복 방지)
+      if (
+        isListening &&
+        fieldIndex < fields.length &&
+        fieldIndex !== currentFieldIndex
+      ) {
         const currentField = fields[fieldIndex]
         console.log('현재 선택된 필드 라벨:', currentField.displayName)
         speakFieldLabel(currentField.displayName)
       }
     },
-    [fields, speakFieldLabel],
+    [fields, speakFieldLabel, currentFieldIndex],
   )
 
   // FloatingMicButton을 위한 inputFields 배열 생성
