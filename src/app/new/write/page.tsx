@@ -10,6 +10,7 @@ import { FieldAnalyzeData, DocumentWriteResponseData } from '@/lib/api-types'
 import { userInfoAtom } from '@/atoms/userAtom'
 import api from '@/lib/api'
 import { UI_CONFIG } from '@/lib/constants'
+import { useVoiceInput } from '@/hooks/useVoiceInput'
 
 // 필드 고유 키 생성 함수
 const getFieldKey = (field: FieldAnalyzeData): string => {
@@ -29,6 +30,20 @@ function WritePageContent() {
   const [error, setError] = useState<string | null>(null)
 
   console.log('userInfo (/new/write)', userInfo)
+
+  // 추가 정보 단계에서만 useVoiceInput 사용
+  const {
+    fieldValues: voiceFieldValues,
+    fieldRefs,
+    handleFieldValueChange,
+    handleFieldFocus,
+    getUpdatedFields,
+    FloatingMicButton,
+  } = useVoiceInput({
+    fields: step === 'additional' ? analyzedFields : [],
+    getFieldKey,
+    lang: 'ko-KR',
+  })
 
   // URL 매개변수에서 formId를 가져오고 로컬 스토리지에서 분석된 필드 데이터 가져오기
   useEffect(() => {
@@ -82,14 +97,17 @@ function WritePageContent() {
 
     setIsWriting(true)
 
-    // 사용자 입력값으로 필드 데이터 업데이트
-    const updatedFields = analyzedFields.map((field) => {
-      const fieldKey = getFieldKey(field)
-      return {
-        ...field,
-        value: fieldValues[fieldKey] || field.value || '',
-      }
-    })
+    // 추가 정보 단계에서는 음성 입력값 사용, 그 외에는 기존 로직
+    const updatedFields =
+      step === 'additional' && analyzedFields.length > 0
+        ? getUpdatedFields()
+        : analyzedFields.map((field) => {
+            const fieldKey = getFieldKey(field)
+            return {
+              ...field,
+              value: fieldValues[fieldKey] || field.value || '',
+            }
+          })
 
     // 문서 작성 API 요청 준비 (DocumentWriteRequest 타입에 맞게 구성)
     const documentData = {
@@ -188,9 +206,9 @@ function WritePageContent() {
           </div>
         ) : (
           <>
-            {/* 분석된 필드 표시 */}
+            {/* 분석된 필드 표시 - 음성 입력 기능 적용 */}
             {analyzedFields.length > 0 ? (
-              analyzedFields.map((field) => {
+              analyzedFields.map((field, index) => {
                 const fieldKey = getFieldKey(field)
                 return (
                   <div key={fieldKey}>
@@ -199,12 +217,20 @@ function WritePageContent() {
                       {UI_CONFIG.SHOW_FIELD_INDEX && ` (#${field.index})`}
                     </label>
                     <input
+                      ref={fieldRefs[fieldKey]}
                       type="text"
-                      value={fieldValues[fieldKey] || ''}
-                      onChange={(e) =>
-                        handleFieldChange(fieldKey, e.target.value)
+                      value={
+                        voiceFieldValues[fieldKey] ||
+                        fieldValues[fieldKey] ||
+                        ''
                       }
+                      onChange={(e) => {
+                        handleFieldChange(fieldKey, e.target.value)
+                        handleFieldValueChange(fieldKey, e.target.value)
+                      }}
+                      onFocus={() => handleFieldFocus(index)}
                       className="w-full bg-[#252932] text-white px-4 rounded-[6px] h-[48px]"
+                      placeholder={`${field.displayName}을(를) 입력하세요`}
                     />
                   </div>
                 )
@@ -232,6 +258,9 @@ function WritePageContent() {
 
       {/* Writing Overlay */}
       {isWriting && <WritingDocumentOverlay />}
+
+      {/* Floating Mic Button - 추가 정보 단계에서만 표시 */}
+      {step === 'additional' && FloatingMicButton}
     </>
   )
 }
