@@ -109,8 +109,8 @@ export default function TestPage() {
     try {
       setLoading('modifyuser')
       const res = await api.user.modifyInfo({
-        address: '서울특별시 서초구 신반포로 123',
-        profileImageUrl: 'https://via.placeholder.com/200',
+        data: { address: '서울특별시 서초구 신반포로 123' },
+        file: file || undefined,
       })
       setResponse(res.data)
       toast.success('사용자 정보 수정 성공')

@@ -49,7 +49,10 @@ export async function updateUserInfo(data: {
   profileImageUrl?: string
 }) {
   return handleApiResponse(
-    api.user.modifyInfo(data),
+    api.user.modifyInfo({
+      data: { address: data.address },
+      file: data.profileImageUrl ? new File([], data.profileImageUrl) : undefined,
+    }),
     '사용자 정보 수정에 실패했습니다.',
     false,
   )
