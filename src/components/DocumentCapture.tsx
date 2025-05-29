@@ -159,9 +159,12 @@ export default function DocumentCapture({
 
   return (
     <main
-      className="flex flex-col min-h-screen relative overflow-hidden"
+      className="flex flex-col min-h-screen relative overflow-hidden bg-black"
       onClick={!isLoading ? takePicture : undefined}
     >
+      {/* 카메라 스트림이 활성화되지 않았을 때 전체 화면을 덮는 배경 */}
+      {!streamActive && <div className="absolute inset-0 bg-black z-[1]" />}
+
       {/* 카메라 비디오 배경 */}
       <video
         ref={videoRef}
