@@ -275,6 +275,7 @@ export const fieldAnalyzeResponseMock = createApiResponse<FieldAnalyzeData[]>([
  */
 export const documentWriteResponseMock =
   createApiResponse<DocumentWriteResponseData>({
+    documentId: 123,
     documentName: '작성된_문서.pdf',
     createdDate: new Date().toISOString(),
     imageUrl:
