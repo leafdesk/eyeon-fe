@@ -30,7 +30,17 @@ export default function DocItem({
       <div className="flex justify-between items-center">
         <div className="space-y-1">
           <div className="inline-block bg-[#EAEAEA] text-[#5C5C5C] text-[10px] font-semibold px-2.5 py-1 rounded-sm">
-            {category}
+            {category === 'RESUME'
+              ? '이력서'
+              : category === 'CERTIFICATE'
+              ? '재직증명서'
+              : category === 'CONSENT'
+              ? '위임장'
+              : category === 'SELF_INTRO'
+              ? '자기소개서'
+              : category === 'REPORT'
+              ? '일일업무보고서'
+              : category}
           </div>
           <h2 className="text-base font-semibold">{title}</h2>
           <p className="text-[#9B9B9B] text-sm">
