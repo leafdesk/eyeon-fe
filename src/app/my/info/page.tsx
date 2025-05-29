@@ -17,6 +17,7 @@ import { UserModifyRequest } from '@/lib/api-types'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { User } from 'lucide-react'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 // 카카오 우편번호 서비스 타입 정의
 declare global {
@@ -49,6 +50,9 @@ export default function MyInfoPage() {
   const [userInfo, setUserInfo] = useAtom(userInfoAtom)
   const [loading, setLoading] = useAtom(userInfoLoadingAtom)
   const [error, setError] = useAtom(userInfoErrorAtom)
+  const { VoiceGuideComponent } = useVoiceGuide(
+    '내 정보 페이지입니다. 상단에는 프로필 사진 변경 버튼이 있고, 주소 입력란과 주소 검색 버튼, 그리고 기본 정보들을 확인할 수 있습니다. 하단에는 저장하기 버튼이 있습니다.',
+  )
 
   // 로컬 상태 (수정 값)
   const [address, setAddress] = useState('')
@@ -262,6 +266,9 @@ export default function MyInfoPage() {
 
       {/* Header */}
       <Header left="/my" title="내 정보" right="voice" />
+
+      {/* Voice Guide Component */}
+      {VoiceGuideComponent}
 
       {/* Profile Section */}
       <div className="flex flex-col items-center mt-6 mb-6">
