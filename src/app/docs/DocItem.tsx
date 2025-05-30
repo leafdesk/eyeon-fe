@@ -22,6 +22,10 @@ export default function DocItem({
     router.push(`/docs/${id}`)
   }
 
+  const getDisplayTitle = (title: string) => {
+    return title.split('/').pop() || title
+  }
+
   return (
     <div
       className="bg-[#1E2436] rounded-lg p-5 border-2 border-[#363C4E] cursor-pointer"
@@ -42,7 +46,7 @@ export default function DocItem({
               ? '일일업무보고서'
               : category}
           </div>
-          <h2 className="text-base font-semibold">{title}</h2>
+          <h2 className="text-base font-semibold">{getDisplayTitle(title)}</h2>
           <p className="text-[#9B9B9B] text-sm">
             {date} <span className="mx-[4px] text-[#363C4E]">|</span> {size}
           </p>
