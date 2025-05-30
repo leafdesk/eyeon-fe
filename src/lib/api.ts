@@ -41,7 +41,7 @@ const apiClient = axios.create({
 
 // Flask API용 Axios 인스턴스 생성
 const flaskClient = axios.create({
-  baseURL: 'https://3.39.215.178:5050/api',
+  baseURL: 'https://3.39.215.178.nip.io/api',
   headers: {
     'Content-Type': 'application/json',
   },
