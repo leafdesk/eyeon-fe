@@ -253,6 +253,18 @@ export default function FloatingMicButton({
           console.log(
             `✅ [FloatingMicButton] 다음 필드 포커스 완료: index ${nextIndex}, label: ${nextField.label}`,
           )
+
+          // 포커스 후 스크롤하여 input을 화면 중앙에 위치시킴
+          setTimeout(() => {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest',
+            })
+            console.log(
+              `📺 [FloatingMicButton] 다음 필드 스크롤 완료: ${nextField.label}`,
+            )
+          }, 50)
         }
       }, 100)
     }
@@ -277,6 +289,18 @@ export default function FloatingMicButton({
           console.log(
             `✅ [FloatingMicButton] 이전 필드 포커스 완료: index ${prevIndex}, label: ${prevField.label}`,
           )
+
+          // 포커스 후 스크롤하여 input을 화면 중앙에 위치시킴
+          setTimeout(() => {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest',
+            })
+            console.log(
+              `📺 [FloatingMicButton] 이전 필드 스크롤 완료: ${prevField.label}`,
+            )
+          }, 50)
         }
       }, 100)
     }
