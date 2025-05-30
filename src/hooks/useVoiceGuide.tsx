@@ -8,9 +8,10 @@ import { TTSOverlay } from '@/app/test/tts/TTSOverlay'
 /**
  * 음성 안내를 위한 커스텀 훅
  * @param text 음성 안내 메시지 (기본값 제공)
+ * @param autoPlay 자동 재생 여부 (기본값: false)
  * @returns VoiceGuideComponent - 음성 안내 오버레이 컴포넌트
  */
-export function useVoiceGuide(text: string = '') {
+export function useVoiceGuide(text: string = '', autoPlay: boolean = false) {
   const [voiceGuideEnabled] = useAtom(voiceGuideAtom)
   const [showOverlay, setShowOverlay] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -29,7 +30,7 @@ export function useVoiceGuide(text: string = '') {
   return {
     VoiceGuideComponent:
       isClient && voiceGuideEnabled && showOverlay ? (
-        <TTSOverlay text={text} />
+        <TTSOverlay text={text} autoPlay={autoPlay} key={text} />
       ) : null,
   }
 }

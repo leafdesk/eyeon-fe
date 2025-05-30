@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import type { DocumentAdviceData } from '@/lib/api-types'
+import { useVoiceGuide } from '@/hooks/useVoiceGuide'
 
 export default function AnalyzeEditPage() {
   const router = useRouter()
@@ -13,6 +14,14 @@ export default function AnalyzeEditPage() {
   const [adviceData, setAdviceData] = useState<DocumentAdviceData[]>([])
   const [editedContents, setEditedContents] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
+
+  // 현재 AI 조언을 음성으로 읽어주는 훅
+  const currentAdvice = adviceData[currentIndex]?.a || ''
+  const { VoiceGuideComponent } = useVoiceGuide(
+    currentAdvice,
+    hasUserInteracted, // 사용자가 한 번 상호작용 후에는 자동 재생
+  )
 
   useEffect(() => {
     // sessionStorage에서 조언 데이터 가져오기
@@ -33,6 +42,23 @@ export default function AnalyzeEditPage() {
       router.push('/analyze/upload')
     }
   }, [router])
+
+  // 사용자 상호작용 감지 (음성 오버레이 터치 또는 버튼 클릭)
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      setHasUserInteracted(true)
+    }
+
+    document.addEventListener('click', handleUserInteraction, { once: true })
+    document.addEventListener('touchstart', handleUserInteraction, {
+      once: true,
+    })
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction)
+      document.removeEventListener('touchstart', handleUserInteraction)
+    }
+  }, [])
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -101,6 +127,9 @@ export default function AnalyzeEditPage() {
 
   return (
     <main className="min-h-screen bg-[#0e1525] text-white flex flex-col">
+      {/* 음성 안내 오버레이 */}
+      {VoiceGuideComponent}
+
       {/* Header */}
       <Header title="문서 수정" left="/analyze/upload" right="voice" />
 
